@@ -88,15 +88,19 @@ def plot_heatmap(group_by, plot_parms, title, xlabel, ylabel, to_zone):
 
     df = fix_date_vars(df_temp_data.copy(), group_by, to_zone=to_zone)
     df_agg = df.groupby(by=[group_by]).mean()
+    st.write(4444444444444444)
 
     fmt, vmin, vmax = plot_parms
     fig = plt.figure(figsize=(48, 2*len(df_agg.columns)))
+    st.write(555555555555555555555)
     sns.set(font_scale=4)
 
     sns.heatmap(df_agg.T.sort_index(), annot=True,  annot_kws={"fontsize":30, "weight": "bold"},
                 fmt=fmt, linewidths=.5,
                 cmap=sns.color_palette("coolwarm", as_cmap=True),
                 vmin=vmin, vmax=vmax, cbar=False)
+
+    st.write(66666666666666666666666)
     plt.title(title, fontsize=60) # title with fontsize 20
     plt.xlabel(xlabel, fontsize=60) # x-axis label with fontsize 15
     plt.ylabel(ylabel, fontsize=60) # y-axis label with fontsize 15
@@ -173,13 +177,17 @@ def main(start_date, end_date, temp_data_param, collection_param, floor_param, a
 
     if (temp_data_param != "Select A/C data") and (aggreg_param != "Select aggregation by") and (collection_param != None):
         st.write(33333333333333)
-        st.write(plot_heatmap(
+
+        fig = plot_heatmap(
             group_by=aggreg_param,
             plot_parms=(fmt, vmin, vmax),
             title=floor_param + '\n',
-            xlabel= '\n' + aggreg_param,
+            xlabel='\n' + aggreg_param,
             ylabel='Rooms' + '\n',
-            to_zone=to_zone))
+            to_zone=to_zone)
+        st.write(777777777777777777777)
+        st.write()
+        st.write(88888888888888888888888)
 
 
 
