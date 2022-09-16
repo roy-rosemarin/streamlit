@@ -139,7 +139,8 @@ def map_rooms_names(rooms_dict):
 @st.cache(allow_output_mutation=True)
 def get_rooms_dict(rooms_mapping_file):
     rooms_df = pd.read_csv(os.path.join(os.path.realpath('./'), rooms_mapping_file), encoding='latin-1')
-    rooms_df = pd.read_csv(os.path.join('code_', rooms_mapping_file), encoding='latin-1')
+    path = os.path.dirname(__file__)
+    rooms_df = pd.read_csv(os.path.join(path, rooms_mapping_file), encoding='latin-1')
 
     rooms_df = rooms_df[['Gateway', 'ROOM', 'BACnet reading number']].set_index(['Gateway', 'BACnet reading number'])
     return rooms_df.to_dict()['ROOM']
