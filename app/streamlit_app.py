@@ -110,7 +110,7 @@ def set_general_settings(start_date, end_date, temp_data_list, floors_list, aggr
     #     st.balloons()
 
     st.header('MALAGA AIR CONDITIONING HEATMAPS')
-    st.caption(f'Version 1.0')
+    st.caption(f'Version 1.0, release data: 16/09/2022')
     st.caption(f'Data pulled over the last 7 days between dates: {start_date} - {end_date}')
 
     temp_data_param = st.selectbox('A/C data', temp_data_list)
