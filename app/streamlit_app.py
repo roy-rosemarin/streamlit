@@ -156,7 +156,7 @@ def main(start_date, end_date, temp_data_param, collection_param, floor_param, a
                                             end_date,
                                             to_zone)
 
-    print(111111111)
+    st.write(111111111)
     df_states = convert_object_cols_to_boolean(df_states)
 
     if temp_data_param == "Avg. degrees (°C)":
