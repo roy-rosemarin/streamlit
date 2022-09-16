@@ -1,2 +1,7 @@
 firebase-admin
 streamlit
+seaborn
+matplotlib
+numpy==1.20.3
+scipy==1.8
+jupyter

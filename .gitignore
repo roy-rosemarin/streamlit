@@ -56,3 +56,7 @@ coverage.xml
 
 # Sphinx documentation
 docs/_build/
+
+# secret key files
+**/amro-partners-firebase-adminsdk-syddx-7de4edb3c4.json
+**/amro-partners-firebase-adminsdk-syddx-7de4edb3c4.toml
