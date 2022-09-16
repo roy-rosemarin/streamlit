@@ -1,5 +1,6 @@
 import os
 import re
+import json
 import weakref, _thread
 from datetime import datetime, timedelta
 from dateutil import tz
@@ -200,7 +201,7 @@ floors_list = [c.replace('BMS_Malaga_Climatizacion_', '') for c in collect_list]
 rooms_dict = get_rooms_dict(rooms_mapping_file)
 
 # TODO: find a better way to handle certificates, e.g. upload to storage bucket
-cert_file_path = os.path.join(os.path.realpath('./'), cert_file)
+cert_file_path = os.path.join(os.path.realpath('../'), cert_file)
 db = get_db(cert_file_path)
 
 start_date = (datetime.today() - timedelta(days=7)).replace(hour=0, minute=0, second=0, microsecond=0)
