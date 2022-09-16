@@ -82,7 +82,7 @@ def get_firebase_data(collect_name, start_date, end_date, to_zone):
 
 
 
-@st.cache(hash_funcs={plt.figure: lambda _: None}, allow_output_mutation=True)
+@st.cache(hash_funcs={plt.figure: lambda _: None}, allow_output_mutation=True, suppress_st_warning=True)
 def plot_heatmap(group_by, plot_parms, title, xlabel, ylabel, to_zone):
     global df_temp_data
 
@@ -186,7 +186,7 @@ def main(start_date, end_date, temp_data_param, collection_param, floor_param, a
             ylabel='Rooms' + '\n',
             to_zone=to_zone)
         st.write(777777777777777777777)
-        st.write()
+        st.write(fig)
         st.write(88888888888888888888888)
 
 
