@@ -7,6 +7,7 @@ from dateutil import tz
 import firebase_admin
 from firebase_admin import credentials
 from firebase_admin import firestore
+from google.oauth2 import service_account
 import pandas as pd
 import seaborn as sns
 import matplotlib.pyplot as plt
@@ -200,9 +201,12 @@ aggregation_list = ("Select aggregation by",
 floors_list = [c.replace('BMS_Malaga_Climatizacion_', '') for c in collect_list]
 rooms_dict = get_rooms_dict(rooms_mapping_file)
 
-# TODO: find a better way to handle certificates, e.g. upload to storage bucket
-cert_file_path = os.path.join(os.path.realpath('../'), cert_file)
-db = get_db(cert_file_path)
+
+#cert_file_path = os.path.join(os.path.realpath('../'), cert_file)
+#db = get_db(cert_file_path)
+key_dict = json.loads(st.secrets["textkey"])
+creds = service_account.Credentials.from_service_account_info(key_dict)
+db = firestore.Client(credentials=creds, project="amro-partners")
 
 start_date = (datetime.today() - timedelta(days=7)).replace(hour=0, minute=0, second=0, microsecond=0)
 end_date = (datetime.today() - timedelta(days=1)).replace(hour=0, minute=0, second=0, microsecond=0)

@@ -1,4 +1,4 @@
-# Run this file from the root of the repo
+# Run this file from the app directory
 
 import toml
 import os
