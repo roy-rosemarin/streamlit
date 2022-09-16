@@ -11,10 +11,11 @@ from google.oauth2 import service_account
 import pandas as pd
 import seaborn as sns
 import matplotlib.pyplot as plt
-from matplotlib.colors import ListedColormap
+import matplotlib
 import streamlit as st
 import PIL.Image
 
+matplotlib.use('Agg')
 PIL.Image.MAX_IMAGE_PIXELS = 300000000
 @st.cache(ttl=24*3600)
 
