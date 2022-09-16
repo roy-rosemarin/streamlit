@@ -16,6 +16,7 @@ import streamlit as st
 import PIL.Image
 
 PIL.Image.MAX_IMAGE_PIXELS = 300000000
+@st.cache(ttl=24*3600)
 
 
 def get_db(cert_file):
@@ -81,7 +82,7 @@ def get_firebase_data(collect_name, start_date, end_date, to_zone):
 
 
 
-@st.cache(hash_funcs={plt.figure: lambda _: None}, allow_output_mutation=True)
+#@st.cache(hash_funcs={plt.figure: lambda _: None}, allow_output_mutation=True)
 def plot_heatmap(group_by, plot_parms, title, xlabel, ylabel, to_zone):
     global df_temp_data
 
