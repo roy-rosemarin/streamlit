@@ -92,12 +92,12 @@ def plot_heatmap(group_by, plot_parms, title, xlabel, ylabel, to_zone):
     st.write(4444444444444444)
 
     fmt, vmin, vmax = plot_parms
-    fig = plt.figure(figsize=(48, 2*len(df_agg.columns)))
+    fig = plt.figure(figsize=(0.8*2*len(df_agg), 0.6*2*len(df_agg.columns)))
     st.write(f'sizeeeeeeeeeeeeeeeee: {2*len(df_agg.columns)}')
     st.write(555555555555555555555)
     sns.set(font_scale=4)
 
-    sns.heatmap(df_agg.T.sort_index(), annot=True,  annot_kws={"fontsize":30, "weight": "bold"},
+    sns.heatmap(df_agg.T.sort_index(), annot=True,  annot_kws={"fontsize":24, "weight": "bold"},
                 fmt=fmt, linewidths=.5,
                 cmap=sns.color_palette("coolwarm", as_cmap=True),
                 vmin=vmin, vmax=vmax, cbar=False)
