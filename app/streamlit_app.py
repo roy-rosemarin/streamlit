@@ -151,12 +151,13 @@ def main(start_date, end_date, temp_data_param, collection_param, floor_param, a
     global df_temp_data
     # df_temp_data is pandas dataframes with the pulled data.
     # It is declared as a global variables so that streamlit does not hash it.
+    st.write(00000000000)
     df_temps, df_states = get_firebase_data(collection_param,
                                             start_date,
                                             end_date,
                                             to_zone)
 
-    st.write(111111111)
+    st.write(1111111111)
     df_states = convert_object_cols_to_boolean(df_states)
 
     if temp_data_param == "Avg. degrees (°C)":
@@ -171,6 +172,7 @@ def main(start_date, end_date, temp_data_param, collection_param, floor_param, a
         map_rooms_names(rooms_dict)
 
     if (temp_data_param != "Select A/C data") and (aggreg_param != "Select aggregation by") and (collection_param != None):
+        st.write(33333333333333)
         st.write(plot_heatmap(
             group_by=aggreg_param,
             plot_parms=(fmt, vmin, vmax),
