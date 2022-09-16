@@ -82,7 +82,7 @@ def get_firebase_data(collect_name, start_date, end_date, to_zone):
 
 
 
-#@st.cache(hash_funcs={plt.figure: lambda _: None}, allow_output_mutation=True)
+@st.cache(hash_funcs={plt.figure: lambda _: None}, allow_output_mutation=True)
 def plot_heatmap(group_by, plot_parms, title, xlabel, ylabel, to_zone):
     global df_temp_data
 
@@ -155,6 +155,8 @@ def main(start_date, end_date, temp_data_param, collection_param, floor_param, a
                                             start_date,
                                             end_date,
                                             to_zone)
+
+    print(111111111)
     df_states = convert_object_cols_to_boolean(df_states)
 
     if temp_data_param == "Avg. degrees (°C)":
