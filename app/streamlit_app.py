@@ -92,6 +92,7 @@ def plot_heatmap(group_by, plot_parms, title, xlabel, ylabel, to_zone):
 
     fmt, vmin, vmax = plot_parms
     fig = plt.figure(figsize=(48, 2*len(df_agg.columns)))
+    st.write(f'sizeeeeeeeeeeeeeeeee: {2*len(df_agg.columns)}')
     st.write(555555555555555555555)
     sns.set(font_scale=4)
 
