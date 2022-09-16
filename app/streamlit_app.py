@@ -89,23 +89,19 @@ def plot_heatmap(group_by, plot_parms, title, xlabel, ylabel, to_zone):
 
     df = fix_date_vars(df_temp_data.copy(), group_by, to_zone=to_zone)
     df_agg = df.groupby(by=[group_by]).mean()
-    st.write(4444444444444444)
 
     fmt, vmin, vmax = plot_parms
-    fig = plt.figure(figsize=(0.8*2*len(df_agg), 0.6*2*len(df_agg.columns)))
-    st.write(f'sizeeeeeeeeeeeeeeeee: {2*len(df_agg.columns)}')
-    st.write(555555555555555555555)
-    sns.set(font_scale=4)
+    fig = plt.figure(figsize=(24, len(df_agg.columns)))
+    sns.set(font_scale=2)
 
-    sns.heatmap(df_agg.T.sort_index(), annot=True,  annot_kws={"fontsize":24, "weight": "bold"},
+    sns.heatmap(df_agg.T.sort_index(), annot=True,  annot_kws={"fontsize": 16, "weight": "bold"},
                 fmt=fmt, linewidths=.5,
                 cmap=sns.color_palette("coolwarm", as_cmap=True),
                 vmin=vmin, vmax=vmax, cbar=False)
 
-    st.write(66666666666666666666666)
-    plt.title(title, fontsize=60) # title with fontsize 20
-    plt.xlabel(xlabel, fontsize=60) # x-axis label with fontsize 15
-    plt.ylabel(ylabel, fontsize=60) # y-axis label with fontsize 15
+    plt.title(title, fontsize=30) # title with fontsize 20
+    plt.xlabel(xlabel, fontsize=30) # x-axis label with fontsize 15
+    plt.ylabel(ylabel, fontsize=30) # y-axis label with fontsize 15
     return fig
 
 
@@ -157,19 +153,16 @@ def main(start_date, end_date, temp_data_param, collection_param, floor_param, a
     global df_temp_data
     # df_temp_data is pandas dataframes with the pulled data.
     # It is declared as a global variables so that streamlit does not hash it.
-    st.write(00000000000)
     df_temps, df_states = get_firebase_data(collection_param,
                                             start_date,
                                             end_date,
                                             to_zone)
 
-    st.write(1111111111)
     df_states = convert_object_cols_to_boolean(df_states)
 
     if temp_data_param == "Avg. degrees (°C)":
         df_temp_data = df_temps
         fmt, vmin, vmax = '.1f', 15, 40
-
     elif temp_data_param == '"On" frequency (%)':
         df_temp_data = df_states
         fmt, vmin, vmax = '0.0%', 0, 1
@@ -178,7 +171,6 @@ def main(start_date, end_date, temp_data_param, collection_param, floor_param, a
         map_rooms_names(rooms_dict)
 
     if (temp_data_param != "Select A/C data") and (aggreg_param != "Select aggregation by") and (collection_param != None):
-        st.write(33333333333333)
 
         fig = plot_heatmap(
             group_by=aggreg_param,
@@ -187,9 +179,7 @@ def main(start_date, end_date, temp_data_param, collection_param, floor_param, a
             xlabel='\n' + aggreg_param,
             ylabel='Rooms' + '\n',
             to_zone=to_zone)
-        st.write(777777777777777777777)
         st.write(fig)
-        st.write(88888888888888888888888)
 
 
 
