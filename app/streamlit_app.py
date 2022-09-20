@@ -92,7 +92,7 @@ def plot_heatmap(df, group_by, plot_parms, title, xlabel, ylabel, to_zone, scale
     fig = plt.figure(figsize=(scale*24, scale*len(df_agg.columns)))
     sns.set(font_scale=scale*2)
 
-    sns.heatmap(df_agg.T.sort_index(), annot=True,  annot_kws={"fontsize": scale*18, "weight": "bold"},
+    sns.heatmap(df_agg.T.sort_index(), annot=True,  annot_kws={"fontsize": scale*16, "weight": "bold"},
                 fmt=fmt, linewidths=.5,
                 cmap=sns.color_palette("coolwarm", as_cmap=True),
                 vmin=vmin, vmax=vmax, cbar=False)
