@@ -95,8 +95,7 @@ def plot_heatmap(df, group_by, plot_parms, title, xlabel, ylabel, to_zone, scale
     sns.heatmap(df_agg.T.sort_index(), annot=True,  annot_kws={"fontsize": scale*18, "weight": "bold"},
                 fmt=fmt, linewidths=.5,
                 cmap=sns.color_palette("coolwarm", as_cmap=True),
-                vmin=vmin, vmax=vmax, c
-    bar=False)
+                vmin=vmin, vmax=vmax, cbar=False)
 
     labels_fontsize = scale * 30
     plt.title(title, fontsize=labels_fontsize) # title with fontsize 20
