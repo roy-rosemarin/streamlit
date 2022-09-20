@@ -185,7 +185,7 @@ def main(start_date, end_date, temp_data_param, collection_param, floor_param,
 
 
 # Config
-figure_memory_scale = 0.25 # scaling the original seaborn in order to reduce memory usage
+figure_memory_scale = 0.2 # scaling the original seaborn in order to reduce memory usage
 
 to_zone = 'Europe/Madrid' # local zone
 cert_file = "amro-partners-firebase-adminsdk-syddx-7de4edb3c4.json" # certification file for firebase authentication
