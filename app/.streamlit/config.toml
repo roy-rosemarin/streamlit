@@ -1,2 +1,3 @@
 [server]
-enableCORS=false
+#enableCORS=false
+#enableWebsocketCompression=false
