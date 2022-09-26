@@ -5,19 +5,17 @@ import weakref, _thread
 from datetime import datetime, timedelta
 from dateutil import tz
 import firebase_admin
-from firebase_admin import credentials
-from firebase_admin import firestore
+from firebase_admin import credentials, firestore
 from google.oauth2 import service_account
 import pandas as pd
 import seaborn as sns
 import matplotlib.pyplot as plt
-import matplotlib
+#import matplotlib
 import streamlit as st
-import PIL.Image
+#import PIL.Image
 
-matplotlib.use('Agg')
-PIL.Image.MAX_IMAGE_PIXELS = 300000000
-@st.cache(ttl=1*3600)
+#matplotlib.use('Agg')
+#PIL.Image.MAX_IMAGE_PIXELS = 300000000
 
 
 def get_db(cert_file):
@@ -59,7 +57,7 @@ def fix_date_vars(df, group_by, to_zone=None):
     return df
 
 
-@st.cache(allow_output_mutation=True,
+@st.cache(allow_output_mutation=True, ttl=4*3600,
           hash_funcs={weakref.KeyedRef: lambda _: None, _thread.LockType: lambda _: None})
 def get_firebase_data(collect_name, start_date, end_date, to_zone):
     start_date_utc = start_date.replace(tzinfo=tz.gettz(to_zone)).astimezone(tz.gettz('UTC')).strftime('%Y-%m-%d %H:%M:%S')
@@ -71,7 +69,7 @@ def get_firebase_data(collect_name, start_date, end_date, to_zone):
     df_temps_list = []
     df_states_list = []
     for doc in docs:
-        if start_date_utc <= doc.id[:10] <= end_date_utc:
+        if start_date_utc <= doc.id[:19].replace('T', ' ') < end_date_utc:
             df_temps_row, df_states_row = doc_to_pandas_row(doc)
             df_temps_list += [df_temps_row]
             df_states_list += [df_states_row]
@@ -83,7 +81,7 @@ def get_firebase_data(collect_name, start_date, end_date, to_zone):
 
 
 
-@st.cache(hash_funcs={plt.figure: lambda _: None}, allow_output_mutation=True, suppress_st_warning=True)
+# @st.cache(hash_funcs={plt.figure: lambda _: None}, allow_output_mutation=True, suppress_st_warning=True)
 def plot_heatmap(df, group_by, plot_parms, title, xlabel, ylabel, to_zone, scale):
     df = fix_date_vars(df, group_by, to_zone=to_zone)
     df_agg = df.groupby(by=[group_by]).mean()
@@ -105,9 +103,6 @@ def plot_heatmap(df, group_by, plot_parms, title, xlabel, ylabel, to_zone, scale
 
 
 def set_general_settings(start_date, end_date, temp_data_list, floors_list, aggregation_list):
-    # if st.button('Balloons?'):
-    #     st.balloons()
-
     st.header('MALAGA AIR CONDITIONING HEATMAPS')
     st.caption(f'Version 1.0, release data: 16/09/2022')
     st.caption(f'Data pulled over the last 7 days between dates: {start_date} - {end_date}')
@@ -139,9 +134,8 @@ def map_rooms_names(df, rooms_dict):
     return df
 
 
-@st.cache(allow_output_mutation=True)
+@st.cache(allow_output_mutation=True, ttl=24*3600)
 def get_rooms_dict(rooms_mapping_file):
-    #rooms_df = pd.read_csv(os.path.join(os.path.realpath('./'), rooms_mapping_file), encoding='latin-1')
     path = os.path.dirname(__file__)
     rooms_df = pd.read_csv(os.path.join(path, rooms_mapping_file), encoding='latin-1')
 
@@ -187,9 +181,9 @@ def main(start_date, end_date, temp_data_param, collection_param, floor_param,
 # Config
 figure_memory_scale = 0.2 # scaling the original seaborn in order to reduce memory usage
 
-to_zone = 'Europe/Madrid' # local zone
-cert_file = "amro-partners-firebase-adminsdk-syddx-7de4edb3c4.json" # certification file for firebase authentication
-rooms_mapping_file = "rooms_codes_malaga.csv" # file cotaining mapping of API rooms' codes to rooms' names
+to_zone = 'Europe/Madrid'  # local zone
+cert_file = "amro-partners-firebase-adminsdk-syddx-7de4edb3c4.json"  # certification file for firebase authentication
+rooms_mapping_file = "rooms_codes_malaga.csv"  # file cotaining mapping of API rooms' codes to rooms' names
 
 temp_data_list = ("Select A/C data",
                     "Avg. degrees (°C)",
@@ -220,7 +214,7 @@ creds = service_account.Credentials.from_service_account_info(key_dict)
 db = firestore.Client(credentials=creds, project="amro-partners")
 
 start_date = (datetime.today() - timedelta(days=7)).replace(hour=0, minute=0, second=0, microsecond=0)
-end_date = (datetime.today() - timedelta(days=1)).replace(hour=0, minute=0, second=0, microsecond=0)
+end_date = (datetime.today()).replace(hour=0, minute=0, second=0, microsecond=0)
 
 collection_param, temp_data_param, floor_param, aggreg_param = \
     set_general_settings(start_date.strftime('%Y-%m-%d'), end_date.strftime('%Y-%m-%d'),
