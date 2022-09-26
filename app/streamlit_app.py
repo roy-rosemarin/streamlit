@@ -16,6 +16,7 @@ import streamlit as st
 
 #matplotlib.use('Agg')
 #PIL.Image.MAX_IMAGE_PIXELS = 300000000
+#st.set_page_config(layout="wide")
 
 
 def get_db(cert_file):
@@ -90,7 +91,7 @@ def plot_heatmap(df, group_by, plot_parms, title, xlabel, ylabel, to_zone, scale
     fig = plt.figure(figsize=(scale*24, scale*len(df_agg.columns)))
     sns.set(font_scale=scale*2)
 
-    sns.heatmap(df_agg.T.sort_index(), annot=True,  annot_kws={"fontsize": scale*16, "weight": "bold"},
+    sns.heatmap(df_agg.T.sort_index(), annot=True, annot_kws={"fontsize": scale*16, "weight": "bold"},
                 fmt=fmt, linewidths=.5,
                 cmap=sns.color_palette("coolwarm", as_cmap=True),
                 vmin=vmin, vmax=vmax, cbar=False)
@@ -134,7 +135,7 @@ def map_rooms_names(df, rooms_dict):
     return df
 
 
-@st.cache(allow_output_mutation=True, ttl=24*3600)
+#@st.cache(allow_output_mutation=True, ttl=4*3600)
 def get_rooms_dict(rooms_mapping_file):
     path = os.path.dirname(__file__)
     rooms_df = pd.read_csv(os.path.join(path, rooms_mapping_file), encoding='latin-1')
@@ -189,14 +190,29 @@ temp_data_list = ("Select A/C data",
                     "Avg. degrees (°C)",
                     '"On" frequency (%)')
 
-collect_list = ["Select floor",
-                "All",
-                "BMS_Malaga_Climatizacion_Planta_S",
+collect_list_general = ["Select floor",
+                        "All"]
+
+collect_list_malaga = ["BMS_Malaga_Climatizacion_Planta_S",
                 "BMS_Malaga_Climatizacion_Planta_B",
                 "BMS_Malaga_Climatizacion_Planta_1",
                 "BMS_Malaga_Climatizacion_Planta_2",
                 "BMS_Malaga_Climatizacion_Planta_3",
                 "BMS_Malaga_Climatizacion_Planta_4"]
+
+collect_list_seville = ["BMS_Seville_Climatizacion_Planta_S",
+                "BMS_Seville_Climatizacion_Planta_B",
+                "BMS_Seville_Climatizacion_Planta_1",
+                "BMS_Seville_Climatizacion_Planta_2",
+                "BMS_Seville_Climatizacion_Planta_3",
+                "BMS_Seville_Climatizacion_Planta_4",
+                "BMS_Seville_Climatizacion_Planta_5",
+                "BMS_Seville_Climatizacion_Planta_6",
+                "BMS_Seville_Climatizacion_Planta_7",
+                "BMS_Seville_Climatizacion_Planta_8",
+                "BMS_Seville_Climatizacion_Planta_9"]
+
+collect_list = collect_list_general + collect_list_malaga
 
 aggregation_list = ("Select aggregation by",
                     "Date",
