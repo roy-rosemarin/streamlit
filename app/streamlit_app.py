@@ -118,11 +118,12 @@ def set_app_settings():
 
 
 def main():
+    db, start_date, end_date, rooms_dict, collect_list, floors_list = set_app_settings()
+
     st.header('MALAGA AIR CONDITIONING HEATMAPS')
     st.caption(f'Version 1.0, release data: 16/09/2022')
     st.caption(f'Data pulled over the last 7 days between dates: {start_date} - {end_date}')
 
-    db, start_date, end_date, rooms_dict, collect_list, floors_list = set_app_settings()
     collection_param, temp_data_param, floor_param, aggreg_param = \
         get_selectbox_choice(cnf.temp_data_list, tuple(floors_list), cnf.aggregation_list)
 
