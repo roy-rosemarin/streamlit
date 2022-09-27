@@ -103,7 +103,7 @@ def run_flow(db, start_date, end_date, temp_data_param, collection_param, floor_
         st.write(fig)
 
 
-@st.cache(allow_output_mutation=True, ttl=4*3600, suppress_st_warning=True,
+@st.cache(allow_output_mutation=True, ttl=4*3600,
           hash_funcs={_thread.RLock: lambda _: None, dict: lambda _: None})
 def set_app_settings():
     db = fbdb.get_db_from_textkey()
@@ -114,14 +114,14 @@ def set_app_settings():
     collect_list = cnf.collect_list_general + cnf.collect_list_malaga
     floors_list = [c.replace('BMS_Malaga_Climatizacion_', '') for c in collect_list]
 
-    st.header('MALAGA AIR CONDITIONING HEATMAPS')
-    st.caption(f'Version 1.0, release data: 16/09/2022')
-    st.caption(f'Data pulled over the last 7 days between dates: {start_date} - {end_date}')
-
     return db, start_date, end_date, rooms_dict, collect_list, floors_list
 
 
 def main():
+    st.header('MALAGA AIR CONDITIONING HEATMAPS')
+    st.caption(f'Version 1.0, release data: 16/09/2022')
+    st.caption(f'Data pulled over the last 7 days between dates: {start_date} - {end_date}')
+
     db, start_date, end_date, rooms_dict, collect_list, floors_list = set_app_settings()
     collection_param, temp_data_param, floor_param, aggreg_param = \
         get_selectbox_choice(cnf.temp_data_list, tuple(floors_list), cnf.aggregation_list)
@@ -139,4 +139,3 @@ def main():
 
 
 main()
-
