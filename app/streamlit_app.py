@@ -122,7 +122,7 @@ def main():
 
     st.header('MALAGA AIR CONDITIONING HEATMAPS')
     st.caption(f'Version 1.0, release data: 16/09/2022')
-    st.caption(f'Data pulled over the last 7 days between dates: {start_date.date()} - {end_date.date()}')
+    st.caption(f'Data pulled over the last 7 days between dates: {start_date.date()} - {(end_date-timedelta(days=1)).date()}')
 
     collection_param, temp_data_param, floor_param, aggreg_param = \
         get_selectbox_choice(cnf.temp_data_list, tuple(floors_list), cnf.aggregation_list)
