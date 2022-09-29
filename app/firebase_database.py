@@ -32,7 +32,7 @@ def get_db_from_textkey():
 
 def _doc_to_pandas_row(doc):
     d_vals = dict(sorted(doc.to_dict().items()))
-    d_temps = dict([(k,[v]) for (k,v) in d_vals.items() if 'Room_Temp' in k])
+    d_temps = dict([(k,[v]) for (k,v) in d_vals.items() if (('Room_Temp' in k) or ('RoomTemp' in k))])
     d_states = dict([(k,[v]) for (k,v) in d_vals.items() if 'State' in k])
     return pd.DataFrame(d_temps, index=[doc.id]), pd.DataFrame(d_states, index=[doc.id])
 
@@ -55,5 +55,4 @@ def get_firebase_data(db, collect_name, start_date, end_date, to_zone):
             df_temps_row, df_states_row = _doc_to_pandas_row(doc)
             df_temps_list += [df_temps_row]
             df_states_list += [df_states_row]
-
     return df_temps_list, df_states_list

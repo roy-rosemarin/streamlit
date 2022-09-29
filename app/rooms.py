@@ -13,10 +13,10 @@ def get_rooms_dict(rooms_mapping_file):
     return rooms_df.to_dict()['ROOM']
 
 
-def map_rooms_names(df, rooms_dict):
+def map_rooms_names(df, rooms_dict, gateway_room_pattern):
     new_columns = []
     for room_id in df.columns:
-        match = re.search(r'VRV([\d]+).[\w.-]+_([\d]+).', room_id)
+        match = re.search(gateway_room_pattern, room_id)
         if match:
             new_columns += [rooms_dict[(int(match.group(1)), int(match.group(2)))]]
         else:
