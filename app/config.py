@@ -13,15 +13,15 @@ gateway_room_dict_sites = {
     "Amro Seville": r'MIT([\d]+).[\w.-]+_([\d]+).'
 }
 
-building_list = ("Select building",
+building_list = ("",
               "Amro Malaga",
               "Amro Seville")
 
-temp_data_list = ("Select A/C data",
+temp_data_list = ("",
                     "Avg. degrees (°C)",
                     '"On" frequency (%)')
 
-collect_list_general = ["Select floor",
+collect_list_general = ["",
                         "All"]
 
 collect_dict_buildings = {
@@ -44,7 +44,7 @@ collect_dict_buildings = {
                 "BMS_Seville_Climatizacion_Planta_9"]
 }
 
-aggregation_list = ("Select aggregation by",
+aggregation_list = ("",
                     "Date",
                     "Hour of Day")
 

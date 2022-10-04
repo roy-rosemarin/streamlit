@@ -1,20 +1,20 @@
 import streamlit as st
-st.header('AIR CONDITIONING HEATMAPS')
+st.set_page_config(layout="wide")
+col1, col2, col3 = st.columns([2, 4, 2])
 
 from datetime import datetime, timedelta
 import pandas as pd
 import seaborn as sns
 import matplotlib.pyplot as plt
 
-st.header('AMRO MALAGA AND AMRO SEVILLE BUILDINGS')
-
 import config as cnf
 import firebase_database as fbdb
 import times
 import rooms
-
+import utils
 import _thread
-st.caption(f'Version 1.1, release data: 29/09/2022')
+
+
 
 def _convert_object_cols_to_boolean(df):
     df[df.columns[df.dtypes == 'object']] = (df[df.columns[df.dtypes == 'object']] == True)
@@ -59,30 +59,25 @@ def plot_heatmap(df, group_by, plot_parms, title, xlabel, ylabel, to_zone, scale
     return fig
 
 
-def get_selectbox_choice():
-    buildnig_data_param = st.selectbox('Building', cnf.building_list)
-    if buildnig_data_param == "Select building":  # no building is selected
-        return None
-    else:  # a building is selected
-        rooms_dict = rooms.get_rooms_dict(cnf.room_dict_sites[buildnig_data_param])
-        gateway_room_pattern = cnf.gateway_room_dict_sites[buildnig_data_param]
-        collect_list = cnf.collect_list_general + cnf.collect_dict_buildings[buildnig_data_param]
-        floors_list = [_convert_collect_name_to_human_readble(c, ' ') for c in collect_list]
-        floor_param = st.selectbox('Floor', floors_list)
-        if floor_param not in ('Select floor', "All"):
-            # choose collection_param from collection_list with same index as the selected floor_param in floors_list
-            collection_param = collect_list[floors_list.index(floor_param)]
-        elif floor_param == "All":
-            collection_param = "All"
-        else:
-            collection_param = None
-
-        temp_data_param = st.selectbox('A/C data', cnf.temp_data_list)
-        aggreg_param = st.selectbox('Average by', cnf.aggregation_list)
+def get_selectbox_choice(buildnig_data_param):
+    rooms_dict = rooms.get_rooms_dict(cnf.room_dict_sites[buildnig_data_param])
+    gateway_room_pattern = cnf.gateway_room_dict_sites[buildnig_data_param]
+    collect_list = cnf.collect_list_general + cnf.collect_dict_buildings[buildnig_data_param]
+    floors_list = [_convert_collect_name_to_human_readble(c, ' ') for c in collect_list]
+    floor_param = col2.selectbox('Select floor', floors_list)
+    if floor_param not in ('', "All"):
+        # choose collection_param from collection_list with same index as the selected floor_param in floors_list
+        collection_param = collect_list[floors_list.index(floor_param)]
+    elif floor_param == "All":
+        collection_param = "All"
+    else:
+        collection_param = None
+    temp_data_param = col2.selectbox('Select A/C data', cnf.temp_data_list)
+    aggreg_param = col2.selectbox('Select average by', cnf.aggregation_list)
 
 
-        return (collect_list, collection_param, temp_data_param,
-                floor_param, aggreg_param, rooms_dict, gateway_room_pattern)
+    return (collect_list, collection_param, temp_data_param,
+            floor_param, aggreg_param, rooms_dict, gateway_room_pattern)
 
 
 def run_flow(db, start_date, end_date, temp_data_param, collection_param, floor_param,
@@ -105,10 +100,10 @@ def run_flow(db, start_date, end_date, temp_data_param, collection_param, floor_
         df_temp_data = df_states
         fmt, vmin, vmax = '0.0%', 0, 1
 
-    if temp_data_param != "Select A/C data":
+    if temp_data_param != "":
         df_temp_data = rooms.map_rooms_names(df_temp_data, rooms_dict, gateway_room_pattern)
 
-    if (temp_data_param != "Select A/C data") and (aggreg_param != "Select aggregation by") and (collection_param != None):
+    if (temp_data_param != "") and (aggreg_param != "") and (collection_param != None):
 
         fig = plot_heatmap(
             df=df_temp_data,
@@ -119,10 +114,24 @@ def run_flow(db, start_date, end_date, temp_data_param, collection_param, floor_
             ylabel='Rooms' + '\n',
             to_zone=to_zone,
             scale=figure_memory_scale)
-        st.write(fig)
+        col2.write(fig)
 
 
-@st.cache(allow_output_mutation=True, ttl=4*3600,
+def set_title(start_date, end_date):
+    #col1, col2, col3 = st.columns([2, 3, 2])
+    with col2:
+        st.header('TEMPERATURE MONITORING DASHBOARD')
+        st.caption(f'Version 1.1, release data: 29/09/2022')
+        st.caption(f'Data pulled over the last 7 days between dates: {start_date.date()} - {(end_date-timedelta(days=1)).date()}')
+    with col1:
+        utils.line_space([col1, col2, col3], [20, 10, 20])
+        buildnig_data_param = col1.radio('Select building', cnf.building_list[1:])
+    return buildnig_data_param
+
+
+
+
+@st.cache(allow_output_mutation=True, ttl=4*3600, suppress_st_warning=True,
           hash_funcs={_thread.RLock: lambda _: None, dict: lambda _: None})
 def set_const_app_settings():
     db = fbdb.get_db_from_textkey()
@@ -133,14 +142,13 @@ def set_const_app_settings():
 
 def main():
     db, start_date, end_date = set_const_app_settings()
-    st.caption(f'Data pulled over the last 7 days between dates: {start_date.date()} - {(end_date-timedelta(days=1)).date()}')
-
-    selectbox_choice = get_selectbox_choice()
+    buildnig_data_param = set_title(start_date, end_date)
+    selectbox_choice = get_selectbox_choice(buildnig_data_param)
     if selectbox_choice:  # if some choice of building has been made
         (collect_list, collection_param, temp_data_param,
          floor_param, aggreg_param, rooms_dict, gateway_room_pattern) = selectbox_choice
 
-        if floor_param not in ('Select floor', "All"):
+        if floor_param not in ('', "All"):
             run_flow(db, start_date, end_date, temp_data_param, collection_param, floor_param,
                  aggreg_param, cnf.to_zone, rooms_dict, gateway_room_pattern, cnf.figure_memory_scale)
         elif floor_param == "All":
