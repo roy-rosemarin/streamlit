@@ -54,7 +54,7 @@ def run_flow(db, start_date, end_date, collect_name, floor_name, building_dict, 
 def set_homepage(start_date, end_date):
     with col2:
         st.header('TEMPERATURE MONITORING DASHBOARD')
-        st.caption(f'Version 1.1, release data: 29/09/2022')
+        st.caption(f'Version {cnf.app_version}, release data: {cnf.release_date}')
         st.caption(f'Data pulled over the last 7 days between dates: {start_date.date()} - {(end_date-timedelta(days=1)).date()}')
     with col1:
         utils.line_space([col1, col2, col3], [20, 10, 20])

@@ -1,3 +1,6 @@
+app_version = 1.2
+release_date = '05/10/2022'
+
 figure_memory_scale = 0.2  # scaling the original seaborn in order to reduce memory usage
 
 cert_file = "amro-partners-firebase-adminsdk-syddx-7de4edb3c4.json"  # certification file for firebase authentication
