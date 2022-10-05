@@ -24,8 +24,8 @@ def get_db_from_cert_file(cert_file):
 
 
 @st.cache(allow_output_mutation=True, ttl=24*3600, hash_funcs={dict: lambda _: None})
-def get_db_from_textkey():
-    key_dict = json.loads(st.secrets["textkey"])
+def get_db_from_firebase_key():
+    key_dict = json.loads(st.secrets["firebase_key"])
     creds = service_account.Credentials.from_service_account_info(key_dict)
     return firestore.Client(credentials=creds, project="amro-partners")
 
