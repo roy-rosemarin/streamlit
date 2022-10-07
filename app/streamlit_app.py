@@ -9,7 +9,6 @@ import config as cnf
 import firebase_database as fbdb
 import rooms
 import plot
-import weather
 
 import utils
 import _thread
