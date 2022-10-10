@@ -1,5 +1,6 @@
 import json
 import pandas as pd
+import utils
 import firebase_admin
 from firebase_admin import credentials, firestore
 import streamlit as st
@@ -30,11 +31,12 @@ def get_db_from_firebase_key():
     return firestore.Client(credentials=creds, project="amro-partners")
 
 
-def _doc_to_pandas_row(doc):
+def _doc_to_pandas_row(doc, field_substring):
+    # TODO the sort should (also) be done after using room mapping
     d_vals = dict(sorted(doc.to_dict().items()))
-    d_temps = dict([(k,[v]) for (k,v) in d_vals.items() if (('Room_Temp' in k) or ('RoomTemp' in k))])
-    d_states = dict([(k,[v]) for (k,v) in d_vals.items() if 'State' in k])
-    return pd.DataFrame(d_temps, index=[doc.id]), pd.DataFrame(d_states, index=[doc.id])
+    # iterate over all items in doc and pull the ones containing one of field_substring elements
+    d_vals_filtered = dict([(k,[v]) for (k,v) in d_vals.items() if any([i in k for i in field_substring])])
+    return pd.DataFrame(d_vals_filtered, index=[doc.id])
 
 
 @st.cache(allow_output_mutation=True, ttl=4*3600,
@@ -43,16 +45,16 @@ def _doc_to_pandas_row(doc):
               _thread.LockType: lambda _: None,
               gcc.Client: lambda _: None
           })
-def get_firebase_data(db, collect_name, start_date, end_date, to_zone):
-    start_date_utc, end_date_utc = times.change_ts_time_zone(start_date, end_date, to_zone, 'UTC')
-    users_ref = db.collection(collect_name)
-    docs = users_ref.stream()
+def get_firebase_data(db, collect_name, start_date_utc, end_date_utc, field_substring):
+    start_date_utc, end_date_utc = times.convert_datetmie_to_string(start_date_utc, end_date_utc)
+    # TODO: Once we have a limited collection pull all data?
+    docs = db.collection(collect_name).stream()
 
-    df_temps_list = []
-    df_states_list = []
+    df_list = []
     for doc in docs:
-        if start_date_utc <= doc.id[:19].replace('T', ' ') < end_date_utc:
-            df_temps_row, df_states_row = _doc_to_pandas_row(doc)
-            df_temps_list += [df_temps_row]
-            df_states_list += [df_states_row]
-    return df_temps_list, df_states_list
+        if start_date_utc <= times.format_firebase_doc_id_string(doc.id) < end_date_utc:
+            df_row = _doc_to_pandas_row(doc, field_substring)
+            df_list += [df_row]
+
+    # TODO: remove this utils conversion call once we have a cooked data collection
+    return utils.convert_object_cols_to_boolean(pd.concat(df_list))
