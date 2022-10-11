@@ -64,9 +64,6 @@ time_param_dict = {
     },
 }
 
-aggregation_list = ("Date (last 7 days)",
-                    "Hour of Day (last 7 days)")
-
 
 sites_dict = {
     "Amro Malaga": {
