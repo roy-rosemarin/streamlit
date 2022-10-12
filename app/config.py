@@ -1,8 +1,8 @@
 from datetime import datetime, timedelta
 
 
-app_version = 1.3
-release_date = '10/10/2022'
+app_version = 1.4
+release_date = '12/10/2022'
 
 figure_memory_scale = 0.25  # scaling the original seaborn in order to reduce memory usage
 
