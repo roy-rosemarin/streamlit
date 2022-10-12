@@ -13,7 +13,7 @@ def convert_object_cols_to_boolean(df):
     return df
 
 
-@st.cache(allow_output_mutation=True, ttl=24*3600)
+#@st.cache(allow_output_mutation=True, ttl=24*3600)
 def get_config_dicts(buildnig_param, data_param, time_param):
     building_dict = cnf.sites_dict[buildnig_param]
     param_dict = cnf.data_param_dict[data_param]
