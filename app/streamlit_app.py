@@ -14,7 +14,7 @@ import utils
 # import google.cloud.firestore_v1.client as gcc
 
 # reboot the web app every midnight (UTC timezone) for up to 365 times
-count = st_autorefresh(interval=times.seconds_until_midnight(), limit=365, key="fizzbuzzcounter")
+count = st_autorefresh(interval=1000*times.seconds_until_midnight(), limit=365, key="fizzbuzzcounter")
 
 # @st.cache(allow_output_mutation=True, ttl=4*3600,
 #           hash_funcs={dict: lambda _: None, gcc.Client: lambda _: None})
