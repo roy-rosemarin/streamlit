@@ -40,10 +40,11 @@ def _doc_to_pandas_row(doc, field_substring):
 
 
 @st.cache(allow_output_mutation=True, ttl=4*3600,
+          show_spinner=False,
           hash_funcs={
               weakref.KeyedRef: lambda _: None,
               _thread.LockType: lambda _: None,
-              gcc.Client: lambda _: None
+              gcc.Client: lambda _: None,
           })
 def get_firebase_data(db, collect_name, start_date_utc, end_date_utc, field_substring):
     start_date_utc, end_date_utc = times.convert_datetmie_to_string(start_date_utc, end_date_utc)

@@ -4,6 +4,7 @@ st.set_page_config(layout="wide")
 
 col1, col2, col3 = st.columns([2, 4, 2])
 import config as cnf
+import times
 import firebase_database as fbdb
 import rooms
 import plot
@@ -12,9 +13,8 @@ import utils
 # import required for hashing while caching data for streamlit
 # import google.cloud.firestore_v1.client as gcc
 
-# reboot the web app once every 24 hours for up to 365 times
-_ = st_autorefresh(interval=86400, limit=365, key="fizzbuzzcounter")
-
+# reboot the web app every midnight (UTC timezone) for up to 365 times
+count = st_autorefresh(interval=times.seconds_until_midnight(), limit=365, key="fizzbuzzcounter")
 
 # @st.cache(allow_output_mutation=True, ttl=4*3600,
 #           hash_funcs={dict: lambda _: None, gcc.Client: lambda _: None})
