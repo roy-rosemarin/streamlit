@@ -25,5 +25,5 @@ def log_time(times, key):
     else:
         times[key] = now
         times['last'] = now
-    return key, times[key]
+    return key, times[key], times['last']
 
