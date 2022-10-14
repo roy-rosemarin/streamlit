@@ -9,7 +9,6 @@ st.set_page_config(layout="wide")
 
 col1, col2, col3 = st.columns([2, 4, 2])
 import config as cnf
-import times
 import firebase_database as fbdb
 import rooms
 import plot
