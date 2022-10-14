@@ -5,10 +5,21 @@ import pandas as pd
 
 
 @st.cache(allow_output_mutation=True, ttl=24*3600)
-def get_rooms_dict(rooms_mapping_file):
+def read_room_file(rooms_mapping_file):
     path = os.path.dirname(__file__)
-    rooms_df = pd.read_csv(os.path.join(path, rooms_mapping_file), encoding='latin-1')
+    return pd.read_csv(os.path.join(path, rooms_mapping_file), encoding='latin-1')
 
+
+@st.cache(allow_output_mutation=True, ttl=24*3600)
+def get_floor_to_rooms_dict(rooms_mapping_file):
+    rooms_df = read_room_file(rooms_mapping_file)
+    rooms_df = rooms_df[['ROOM', 'Title']].groupby('Title')['ROOM'].apply(list)
+    return rooms_df.to_dict()
+
+
+@st.cache(allow_output_mutation=True, ttl=24*3600)
+def get_code_to_room_dict(rooms_mapping_file):
+    rooms_df = read_room_file(rooms_mapping_file)
     rooms_df = (rooms_df[['Gateway', 'ROOM', 'BACnet reading number', 'Title']]
                 .set_index(['Gateway', 'BACnet reading number']))
     return rooms_df.to_dict(orient='index')

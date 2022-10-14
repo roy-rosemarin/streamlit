@@ -17,3 +17,7 @@ def seconds_until_midnight(dt=None):
     if dt is None:
         dt = datetime.utcnow()
     return ((24 - dt.hour - 1) * 60 * 60) + ((60 - dt.minute - 1) * 60) + (60 - dt.second)
+
+
+def milliseconds_until_midnight(dt=None):
+    return 1000 * seconds_until_midnight(dt)

@@ -1,6 +1,4 @@
-import streamlit as st
 import config as cnf
-
 
 def line_space(cols_list, lines_list):
     for col, lines in zip(cols_list, lines_list):
@@ -19,3 +17,4 @@ def get_config_dicts(buildnig_param, data_param, time_param):
     param_dict = cnf.data_param_dict[data_param]
     time_param_dict = cnf.time_param_dict[time_param]
     return building_dict, param_dict, time_param_dict
+

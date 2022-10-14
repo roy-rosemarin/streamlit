@@ -3,7 +3,7 @@ import matplotlib.pyplot as plt
 import pandas as pd
 import config as cnf
 import times
-#from natsort import natsort_keygen, ns
+#from natsort import natsorted
 #from st_aggrid import AgGrid
 #import streamlit as st
 
@@ -30,7 +30,10 @@ def plot_heatmap(df, time_param, plot_parms, title, to_zone, scale, col):
     #        .sort_index().style
     #        .background_gradient(cmap='bwr', vmin=vmin, vmax=vmax))
     #col.dataframe(df_agg.sort_index().style.hide_index().background_gradient(cmap='bwr', vmin=vmin, vmax=vmax))
-    sns.heatmap(df_agg.T.sort_index(), annot=True, annot_kws={"fontsize": scale*16, "weight": "bold"},
+    #natsorted(df_agg.T.index)
+    df_plot = df_agg.T.sort_index()
+    sns.heatmap(df_plot,
+                annot=True, annot_kws={"fontsize": scale*16, "weight": "bold"},
                 fmt=fmt, linewidths=.5,
                 cmap=sns.color_palette("coolwarm", as_cmap=True),
                 vmin=vmin, vmax=vmax, cbar=False)
@@ -39,4 +42,5 @@ def plot_heatmap(df, time_param, plot_parms, title, to_zone, scale, col):
     plt.title(title, fontsize=labels_fontsize) # title with fontsize 20
     plt.xlabel(time_param_dict['aggregation_field_name'], fontsize=labels_fontsize) # x-axis label with fontsize 15
     #plt.ylabel(ylabel, fontsize=labels_fontsize) # y-axis label with fontsize 15
+    plt.yticks(rotation=0)
     col.write(fig)
