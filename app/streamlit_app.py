@@ -1,6 +1,7 @@
 import times
+import logging
 times_log = {}
-print(times.log_time(times_log, 'start'))
+logging.info(times.log_time(times_log, 'start'))
 
 
 from streamlit_autorefresh import st_autorefresh
