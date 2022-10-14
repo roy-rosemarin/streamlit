@@ -17,14 +17,14 @@ vmin: heatmap scale minimum
 vmax: heatmap scale maximum
 '''
 data_param_dict = {
-    # "Avg. room temperature (°C)": {
-    #     'sites_dict_val': 'VRV_collections',
-    #     'is_rooms': True,
-    #     'field_substring': ['Room_Temp', 'RoomTemp'],
-    #     'fmt': '.1f',
-    #     'vmin': 15,
-    #     'vmax': 40
-    # },
+    "Avg. room temperature (°C)": {
+        'sites_dict_val': 'VRV_collections',
+        'is_rooms': True,
+        'field_substring': ['Room_Temp', 'RoomTemp'],
+        'fmt': '.1f',
+        'vmin': 15,
+        'vmax': 40
+    },
     "Air conditioning cooling set point (°C)": {
         'sites_dict_val': 'VRV_setpoint_collections',
         'is_rooms': True,
