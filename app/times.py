@@ -24,6 +24,7 @@ def log_time(times, key):
         times[key] = (now - times['last']).total_seconds()
     else:
         times[key] = now
-        times['last'] = now
-    return key, times[key], times['last']
+
+    times['last'] = now
+    return key, times[key]
 
