@@ -8,6 +8,8 @@ from google.oauth2 import service_account
 import _thread, weakref, google.cloud.firestore_v1.client as gcc
 import times
 
+import logging
+
 
 @st.cache(allow_output_mutation=True, ttl=24*3600)
 def get_db_from_cert_file(cert_file):
@@ -47,15 +49,20 @@ def _doc_to_pandas_row(doc, field_substring):
               gcc.Client: lambda _: None,
           })
 def get_firebase_data(db, collect_name, start_date_utc, end_date_utc, field_substring):
+    d = {}
+    logging.info(times.log_time(d, f'0'))
     start_date_utc, end_date_utc = times.convert_datetmie_to_string(start_date_utc, end_date_utc)
     # TODO: Once we have a limited collection pull all data?
     docs = db.collection(collect_name).stream()
-
+    logging.info(times.log_time(d, f'1'))
     df_list = []
     for doc in docs:
+        logging.info(times.log_time(d, f'2'))
         if start_date_utc <= times.format_firebase_doc_id_string(doc.id) < end_date_utc:
+            logging.info(times.log_time(d, f'3'))
             df_row = _doc_to_pandas_row(doc, field_substring)
             df_list += [df_row]
-
+            logging.info(times.log_time(d, f'4'))
+    logging.info(times.log_time(d, f'5'))
     # TODO: remove this utils conversion call once we have a cooked data collection
     return utils.convert_object_cols_to_boolean(pd.concat(df_list))
