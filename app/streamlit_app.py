@@ -1,10 +1,6 @@
 import times
-import logging
-import os
-
-logging.debug('This message should go to the log file')
 times_log = {}
-logging.info(times.log_time(times_log, 'start'))
+print(times.log_time(times_log, 'start'))
 
 
 from streamlit_autorefresh import st_autorefresh
