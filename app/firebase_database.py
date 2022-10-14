@@ -57,12 +57,12 @@ def get_firebase_data(db, collect_name, start_date_utc, end_date_utc, field_subs
     logging.info(times.log_time(d, f'1'))
     df_list = []
     for doc in docs:
-        logging.info(times.log_time(d, f'2'))
+        logging.info(times.log_time(d, f'2 {doc.id}'))
         if start_date_utc <= times.format_firebase_doc_id_string(doc.id) < end_date_utc:
-            logging.info(times.log_time(d, f'3'))
+            logging.info(times.log_time(d, f'3 {doc.id}'))
             df_row = _doc_to_pandas_row(doc, field_substring)
             df_list += [df_row]
-            logging.info(times.log_time(d, f'4'))
-    logging.info(times.log_time(d, f'5'))
+            logging.info(times.log_time(d, f'4 {doc.id}'))
+    logging.info(times.log_time(d, f'5 {doc.id}'))
     # TODO: remove this utils conversion call once we have a cooked data collection
     return utils.convert_object_cols_to_boolean(pd.concat(df_list))
