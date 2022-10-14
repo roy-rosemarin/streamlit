@@ -27,20 +27,20 @@ def run_flow_rooms(db, collect_name, collect_title, building_param, data_param, 
     building_dict, param_dict, time_param_dict = utils.get_config_dicts(building_param, data_param, time_param)
     df_pd = fbdb.get_firebase_data(db, collect_name, time_param_dict['start_date_utc'], time_param_dict['end_date_utc'],
                                    param_dict['field_substring'])
-    print(times.log_time(times_log, f'got_firebase_data {collect_title}'))
+    logging.info(times.log_time(times_log, f'got_firebase_data {collect_title}'))
     fmt, vmin, vmax = param_dict['fmt'], param_dict['vmin'], param_dict['vmax']
     if param_dict['is_rooms']:
         rooms_dict = rooms.get_rooms_dict(building_dict['rooms_file'])
         gateway_room_pattern = building_dict['gateway_reg_express']
         df_pd = rooms.map_rooms_names(df_pd.copy(), rooms_dict, gateway_room_pattern)
-        print(times.log_time(times_log, f'mapped room names {collect_title}'))
+        logging.info(times.log_time(times_log, f'mapped room names {collect_title}'))
         floors_order_dict = {k: v for v, k in enumerate(building_dict['floors_order'])}
         for rooms_title in sorted(set(df_pd.columns.get_level_values(0)),
                                   key=lambda item: floors_order_dict.get(item, len(floors_order_dict))):
             condition = df_pd.columns.get_level_values(0) == rooms_title
             dff = df_pd.loc[:, condition]
             dff.columns = dff.columns.get_level_values(1)
-            print(times.log_time(times_log, f'start_plot {rooms_title}'))
+            logging.info(times.log_time(times_log, f'start_plot {rooms_title}'))
             plot.plot_heatmap(
                 df=dff,
                 time_param=time_param,
@@ -51,9 +51,9 @@ def run_flow_rooms(db, collect_name, collect_title, building_param, data_param, 
                 to_zone=building_dict['time_zone'],
                 scale=cnf.figure_memory_scale,
                 col=col2)
-            print(times.log_time(times_log, f'complete_plot {rooms_title}'))
+            logging.info(times.log_time(times_log, f'complete_plot {rooms_title}'))
     else:
-        print(times.log_time(times_log, f'start_plot {collect_title}'))
+        logging.info(times.log_time(times_log, f'start_plot {collect_title}'))
         plot.plot_heatmap(
             df=df_pd,
             time_param=time_param,
@@ -64,7 +64,7 @@ def run_flow_rooms(db, collect_name, collect_title, building_param, data_param, 
             to_zone=building_dict['time_zone'],
             scale=cnf.figure_memory_scale,
             col=col2)
-        print(times.log_time(times_log, f'complete_plot {collect_title}'))
+        logging.info(times.log_time(times_log, f'complete_plot {collect_title}'))
 
 
 def set_homepage():
@@ -79,14 +79,14 @@ def set_homepage():
 
 def main():
     db = fbdb.get_db_from_firebase_key()  # Set unchanged settings in the app once
-    print(times.log_time(times_log, 'fetched_db'))
+    logging.info(times.log_time(times_log, 'fetched_db'))
     building_param, data_param, time_param = set_homepage()  # Get choice of building
     building_dict, param_dict, time_param_dict = utils.get_config_dicts(building_param, data_param, time_param)
     collections = building_dict[param_dict['sites_dict_val']]
-    print(times.log_time(times_log, 'fetched_settings'))
+    logging.info(times.log_time(times_log, 'fetched_settings'))
     for collect_name, collect_title in collections:
         run_flow_rooms(db, collect_name, collect_title, building_param, data_param, time_param)
-        print(times.log_time(times_log, f'flow completed {collect_title}'))
+        logging.info(times.log_time(times_log, f'flow completed {collect_title}'))
 
 
 
