@@ -3,6 +3,8 @@ import matplotlib.pyplot as plt
 import pandas as pd
 import config as cnf
 import times
+
+pd.options.mode.chained_assignment = None  # default='warn'
 #from natsort import natsort_keygen, ns
 #from st_aggrid import AgGrid
 #import streamlit as st

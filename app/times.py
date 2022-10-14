@@ -1,6 +1,5 @@
 from datetime import datetime
 
-
 def convert_datetmie_to_string(start_date_utc, end_date_utc):
     return start_date_utc.strftime('%Y-%m-%d %H:%M:%S'), end_date_utc.strftime('%Y-%m-%d %H:%M:%S')
 
@@ -17,3 +16,14 @@ def seconds_until_midnight(dt=None):
     if dt is None:
         dt = datetime.utcnow()
     return ((24 - dt.hour - 1) * 60 * 60) + ((60 - dt.minute - 1) * 60) + (60 - dt.second)
+
+
+def log_time(times, key):
+    now = datetime.utcnow()
+    if times.get('last'):
+        times[key] = (now - times['last']).total_seconds()
+    else:
+        times[key] = now
+        times['last'] = now
+    return key, times[key]
+
