@@ -3,4 +3,4 @@
 #enableWebsocketCompression=false
 
 [logger]
-level = "debug"
+#level = "debug"
