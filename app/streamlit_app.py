@@ -1,7 +1,6 @@
 import times
-import logging
+#import logging
 times_log = {}
-logging.info(times.log_time(times_log, 'start'))
 
 
 from streamlit_autorefresh import st_autorefresh
@@ -25,10 +24,8 @@ count = st_autorefresh(interval=1000*times.seconds_until_midnight(), limit=365, 
 #           hash_funcs={dict: lambda _: None, gcc.Client: lambda _: None})
 def run_flow_rooms(db, collect_name, collect_title, building_param, data_param, time_param):
     building_dict, param_dict, time_param_dict = utils.get_config_dicts(building_param, data_param, time_param)
-    logging.info(times.log_time(times_log, f'starting_firebase_data {collect_title}'))
     df_pd = fbdb.get_firebase_data(db, collect_name, time_param_dict['start_date_utc'], time_param_dict['end_date_utc'],
                                    param_dict['field_substring'])
-    logging.info(times.log_time(times_log, f'got_firebase_data {collect_title}'))
     fmt, vmin, vmax = param_dict['fmt'], param_dict['vmin'], param_dict['vmax']
     if param_dict['is_rooms']:
         rooms_dict = rooms.get_rooms_dict(building_dict['rooms_file'])
