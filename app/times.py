@@ -1,8 +1,13 @@
 from datetime import datetime
+from pytz import timezone
+
+
+def localise_time_now(tz):
+    return timezone('UTC').localize(datetime.utcnow()).astimezone(timezone(tz))
 
 
 def convert_datetmie_to_string(start_date_utc, end_date_utc):
-    return start_date_utc.strftime('%Y-%m-%d %H:%M:%S'), end_date_utc.strftime('%Y-%m-%d %H:%M:%S')
+    return start_date_utc.strftime('%Y-%m-%dT%H:%M:%S'), end_date_utc.strftime('%Y-%m-%dT%H:%M:%S')
 
 
 def change_pd_time_zone(datetime_col, source_tz, destin_tz):

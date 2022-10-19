@@ -64,6 +64,8 @@ data_param_dict = {
     }
 }
 
+
+# TODO: we need to localise the start_date and end_date
 time_param_dict = {
     "Date (last 7 days)": {
         'start_date_utc': (datetime.utcnow() - timedelta(days=7)).replace(hour=0, minute=0, second=0, microsecond=0),
@@ -88,17 +90,7 @@ time_param_dict = {
 
 sites_dict = {
     "Amro Seville": {
-        "VRV_collections": [("BMS_Seville_Climatizacion_Planta_S", "Planta S"),
-                            ("BMS_Seville_Climatizacion_Planta_B", "Planta B"),
-                            ("BMS_Seville_Climatizacion_Planta_1", "Planta 1"),
-                            ("BMS_Seville_Climatizacion_Planta_2", "Planta 2"),
-                            ("BMS_Seville_Climatizacion_Planta_3", "Planta 3"),
-                            ("BMS_Seville_Climatizacion_Planta_4", "Planta 4"),
-                            ("BMS_Seville_Climatizacion_Planta_5", "Planta 5"),
-                            ("BMS_Seville_Climatizacion_Planta_6", "Planta 6"),
-                            ("BMS_Seville_Climatizacion_Planta_7", "Planta 7"),
-                            ("BMS_Seville_Climatizacion_Planta_8", "Planta 8"),
-                            ("BMS_Seville_Climatizacion_Planta_9", "Planta 9")],
+        "VRV_collections": [('BMS_Seville_Climatizacion_VRV', None)],
         'VRV_setpoint_collections': [('BMS_Seville_Climatizacion_VRV_setpoints', None)],
         'weather_collection': [('weather_Seville', 'Outside temperature (°C) Seville')],
         'time_zone': 'Europe/Madrid',
