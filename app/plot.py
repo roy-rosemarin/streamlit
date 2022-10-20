@@ -6,6 +6,9 @@ import times
 import streamlit as st
 
 
+pd.options.mode.chained_assignment = None  # default='warn'
+
+
 def set_date_vars(df, time_param_dict, to_zone=None):
 
     datetime_col = pd.to_datetime(df.index, format="%Y-%m-%d %H:%M:%S")

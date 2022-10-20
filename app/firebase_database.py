@@ -5,6 +5,7 @@ import firebase_admin
 from firebase_admin import credentials, firestore
 import streamlit as st
 from google.oauth2 import service_account
+from google.cloud.firestore_v1.field_path import FieldPath
 import _thread, weakref, google.cloud.firestore_v1.client as gcc
 import times
 

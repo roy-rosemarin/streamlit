@@ -1,3 +1,6 @@
 [server]
 #enableCORS=false
-enableWebsocketCompression=false
+#enableWebsocketCompression=false
+
+[logger]
+#level = "debug"

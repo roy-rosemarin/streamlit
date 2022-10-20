@@ -1,10 +1,14 @@
+import times
+#import logging
+times_log = {}
+
+
 from streamlit_autorefresh import st_autorefresh
 import streamlit as st
 st.set_page_config(layout="wide")
 
 
 import config as cnf
-import times
 import firebase_database as fbdb
 import utils
 import heatmaps as hmap

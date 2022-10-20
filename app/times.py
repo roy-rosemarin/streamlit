@@ -5,7 +5,6 @@ from pytz import timezone
 def localise_time_now(tz):
     return timezone('UTC').localize(datetime.utcnow()).astimezone(timezone(tz))
 
-
 def convert_datetmie_to_string(start_date_utc, end_date_utc):
     return start_date_utc.strftime('%Y-%m-%dT%H:%M:%S'), end_date_utc.strftime('%Y-%m-%dT%H:%M:%S')
 
@@ -26,3 +25,14 @@ def seconds_until_midnight(dt=None):
 
 def milliseconds_until_midnight(dt=None):
     return 1000 * seconds_until_midnight(dt)
+
+
+def log_time(times, key):
+    now = datetime.utcnow()
+    if times.get('last'):
+        times[key] = (now - times['last']).total_seconds()
+    else:
+        times[key] = now
+
+    times['last'] = now
+    return key, times[key]
