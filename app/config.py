@@ -3,10 +3,15 @@ from datetime import datetime, timedelta
 
 app_version = 1.4
 release_date = '12/10/2022'
+test = True
 
 figure_memory_scale = 0.25  # scaling the original seaborn in order to reduce memory usage
 
 cert_file = "amro-partners-firebase-adminsdk-syddx-7de4edb3c4.json"  # certification file for firebase authentication
+
+
+tabs = ["HEATMAPS", "CHARTS"]
+
 
 '''
 data_param_dict maps keys strings to be selected by user (as keys) to a list of parameters:
@@ -25,7 +30,7 @@ data_param_dict = {
         'vmin': 15,
         'vmax': 40
     },
-    "Air conditioning cooling set point (°C)": {
+    "Cooling temperature set point (°C)": {
         'sites_dict_val': 'VRV_setpoint_collections',
         'is_rooms': True,
         'field_substring': ['SetTempCool'],
@@ -33,7 +38,7 @@ data_param_dict = {
         'vmin': 15,
         'vmax': 40
     },
-    "Air conditioning heating set point (°C)": {
+    "Heating temperature set point (°C)": {
         'sites_dict_val': 'VRV_setpoint_collections',
         'is_rooms': True,
         'field_substring': ['SetTempHeat'],
@@ -44,7 +49,7 @@ data_param_dict = {
     'Percentage of A/C usage (%)': {
         'sites_dict_val': 'VRV_collections',
         'is_rooms': True,
-        'field_substring': ['State'],
+        'field_substring': ['OnOffState', 'State_BI'],
         'fmt': '0.0%',
         'vmin': 0,
         'vmax': 1
@@ -59,12 +64,14 @@ data_param_dict = {
     }
 }
 
+
+# TODO: we need to localise the start_date and end_date
 time_param_dict = {
     "Date (last 7 days)": {
         'start_date_utc': (datetime.utcnow() - timedelta(days=7)).replace(hour=0, minute=0, second=0, microsecond=0),
         'end_date_utc': (datetime.utcnow()).replace(hour=0, minute=0, second=0, microsecond=0),
         'aggregation_field_name': 'Date',
-        'aggregation_strftime': '%Y-%m-%d'
+        'aggregation_strftime': '%Y-%m-%d\n%A'
     },
     "Hour of Day (last 7 days)": {
         'start_date_utc': (datetime.utcnow() - timedelta(days=7)).replace(hour=0, minute=0, second=0, microsecond=0),
@@ -72,7 +79,7 @@ time_param_dict = {
         'aggregation_field_name': 'Hour',
         'aggregation_strftime': '%H'
     },
-    "Now (last 15 minutes)": {
+    "Latest reading": {
         'start_date_utc': (datetime.utcnow() - timedelta(minutes=15)),
         'end_date_utc': (datetime.utcnow()),
         'aggregation_field_name': 'Local time',
@@ -83,17 +90,7 @@ time_param_dict = {
 
 sites_dict = {
     "Amro Seville": {
-        "VRV_collections": [("BMS_Seville_Climatizacion_Planta_S", "Planta S"),
-                            ("BMS_Seville_Climatizacion_Planta_B", "Planta B"),
-                            ("BMS_Seville_Climatizacion_Planta_1", "Planta 1"),
-                            ("BMS_Seville_Climatizacion_Planta_2", "Planta 2"),
-                            ("BMS_Seville_Climatizacion_Planta_3", "Planta 3"),
-                            ("BMS_Seville_Climatizacion_Planta_4", "Planta 4"),
-                            ("BMS_Seville_Climatizacion_Planta_5", "Planta 5"),
-                            ("BMS_Seville_Climatizacion_Planta_6", "Planta 6"),
-                            ("BMS_Seville_Climatizacion_Planta_7", "Planta 7"),
-                            ("BMS_Seville_Climatizacion_Planta_8", "Planta 8"),
-                            ("BMS_Seville_Climatizacion_Planta_9", "Planta 9")],
+        "VRV_collections": [('BMS_Seville_Climatizacion_VRV', None)],
         'VRV_setpoint_collections': [('BMS_Seville_Climatizacion_VRV_setpoints', None)],
         'weather_collection': [('weather_Seville', 'Outside temperature (°C) Seville')],
         'time_zone': 'Europe/Madrid',
