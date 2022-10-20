@@ -26,20 +26,20 @@ def run_flow_charts(db, building_param, floor_param, room_param, col):
 
     df = utils.join_pandas_df_list(dfs_list)
 
-    # column = df['Percentage of A/C usage (%)']
-    # start_on_times = []
-    # end_on_times = []
-    # if column.iloc[0]:
-    #     start_on_times += [list(df.index)[0]]
-    # if column.iloc[-1]:
-    #     end_on_times += [list(df.index)[-1]]
-    #
-    # start_on_times = start_on_times + list(df[(column - column.shift(1)) > 0].index)
-    # end_on_times = list(df[(column - column.shift(-1)) > 0].index) + start_on_times
-    # start_on_times = [t - timedelta(minutes=7.5) for t in start_on_times]
-    # end_on_times = [t + timedelta(minutes=7.5) for t in end_on_times]
-    # df2 = pd.DataFrame({'start_on_times': start_on_times, 'end_on_times': end_on_times})
-    # print(df2)
+    column = df['Percentage of A/C usage (%)']
+    start_on_times = []
+    end_on_times = []
+    if column.iloc[0]:
+        start_on_times += [list(df.index)[0]]
+    if column.iloc[-1]:
+        end_on_times += [list(df.index)[-1]]
+
+    start_on_times = start_on_times + list(df[(column - column.shift(1)) > 0].index)
+    end_on_times = list(df[(column - column.shift(-1)) > 0].index) + end_on_times
+    start_on_times = [t - timedelta(minutes=7.5) for t in start_on_times]
+    end_on_times = [t + timedelta(minutes=7.5) for t in end_on_times]
+    df2 = alt.pd.DataFrame({'start_on_times': start_on_times, 'end_on_times': end_on_times})
+    print(df2)
 
     if st.session_state.show_raw_data_charts:
         col.dataframe(df)
@@ -56,8 +56,14 @@ def run_flow_charts(db, building_param, floor_param, room_param, col):
                             legend=alt.Legend(labelFontSize=14, direction='horizontal', titleAnchor='middle', orient='bottom', title=''),
                             scale=alt.Scale(domain=domain, range=range_)
                             )
-        ).configure_view(strokeWidth=0))
-        col.altair_chart(chart.interactive(), use_container_width=True)
+        ))
+
+        rect = alt.Chart(df2).mark_rect().encode(
+            x='start:T',
+            x2='end:T'
+        )
+        ch_lay = alt.layer(chart, rect).configure_view(strokeWidth=0)
+        col.altair_chart(ch_lay.interactive(), use_container_width=True)
     current_time = time.time()
     print(current_time - last_time, "seconds")
 
