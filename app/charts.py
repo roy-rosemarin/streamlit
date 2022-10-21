@@ -2,11 +2,11 @@ import rooms
 import pandas as pd
 import config as cnf
 import utils
-from datetime import datetime, timedelta
-import time
+from datetime import timedelta
 import streamlit as st
 import altair as alt
 import times
+import plot
 
 
 def set_params_charts(col):
@@ -19,37 +19,53 @@ def set_params_charts(col):
 
 
 def run_flow_charts(db, building_param, floor_param, room_param, col):
-    last_time = time.time()
     dfs_list = []
     for data_param in cnf.data_param_dict.keys():
         dfs_list += [loop_over_params(db, building_param, data_param, room_param, floor_param)]
 
     df = utils.join_pandas_df_list(dfs_list)
 
-    column = df['Percentage of A/C usage (%)']
-    start_on_times = []
-    end_on_times = []
-    if column.iloc[0]:
-        start_on_times += [list(df.index)[0]]
-    if column.iloc[-1]:
-        end_on_times += [list(df.index)[-1]]
+    max_datetime = df.index[-1]
 
-    start_on_times = start_on_times + list(df[(column - column.shift(1)) > 0].index)
-    end_on_times = list(df[(column - column.shift(-1)) > 0].index) + end_on_times
-    start_on_times = [t - timedelta(minutes=7.5) for t in start_on_times]
-    end_on_times = [t + timedelta(minutes=7.5) for t in end_on_times]
-    df2 = alt.pd.DataFrame({'start_on_times': start_on_times, 'end_on_times': end_on_times})
-    print(df2)
+    df_on_off_times = plot.create_start_end_times(df, 'Percentage of A/C usage (%)')
+    pred_row = pd.DataFrame([[None]*len(df.columns)], columns=df.columns, index=[max_datetime+timedelta(hours=3)])
+    pred_row['Outside temperature (°C)'] = df.iloc[-1]['_Outside temperature 3h prediction (°C)']
+    df = pd.concat([df, pred_row])
 
     if st.session_state.show_raw_data_charts:
-        col.dataframe(df)
+        col.dataframe(df, use_container_width=True)
     else:
-        xvars = [col for col in df.columns if col != 'Percentage of A/C usage (%)']
+        # if col.checkbox("Show simulated line", value=False):
+        #     diff2outside = df["Avg. room temperature (°C)"] - df["Outside temperature (°C)"]
+        #     pos_diff2outside = diff2outside.clip(lower=0, upper=None)
+        #     neg_diff2outside = - diff2outside.clip(lower=None, upper=0)
+        #     diff2ac = df["Avg. room temperature (°C)"] - df["Cooling temperature set point (°C)"]
+        #     pos_diff2ac = neg_diff2outside.clip(lower=0, upper=None)
+        #     neg_diff2ac = - neg_diff2outside.clip(lower=None, upper=0)
+        #     ac_on = df['Percentage of A/C usage (%)']
+        #     ac_off = 1 - ac_on
+        #
+        #     df["Avg. room temperature (°C)"] = (df["Avg. room temperature (°C)"]
+        #                    - 0.3 * ac_off * pos_diff2outside
+        #                    - 0.2 * ac_off * neg_diff2outside
+        #                    - 0.2 * ac_on * (pos_diff2ac > 2)
+        #                    #- 0.1 * ac_on * (neg_diff2ac > 2)
+        #                    )
+        # print(df)
+        # TODO: must improve this code, no need for a seperate chart for predictions
+        xvars = [col for col in df.columns if
+                 col not in ('Percentage of A/C usage (%)', '_Outside temperature 3h prediction (°C)')]
         df.index.name = "Time"
         df = df[xvars].reset_index().melt('Time')
         domain = xvars
-        range_ = ['blue', 'lightskyblue', 'red', 'burlywood']
-        chart = (alt.Chart(df).mark_line().encode(
+        if len(df.columns==2):
+            range_ = ['blue', 'burlywood']
+        else:
+            range_ = ['blue', 'lightskyblue', 'red', 'burlywood']
+
+        chart = (alt.Chart(df.loc[df['Time'] <= max_datetime]).mark_line(
+        #    strokeDash=alt.condition(f'datum.Time < {max_datetime}', [0], [1, 1])
+        ).encode(
             x=alt.X('Time', axis=alt.Axis(title='', formatType="time", tickColor='white', grid=False, domain=False)),
             y=alt.Y('value', axis=alt.Axis(title='', tickColor='white', domain=False)),
             color=alt.Color('variable',
@@ -58,21 +74,29 @@ def run_flow_charts(db, building_param, floor_param, room_param, col):
                             )
         ))
 
-        rect = alt.Chart(df2).mark_rect().encode(
-            x='start:T',
-            x2='end:T'
+        pred_chart = (alt.Chart(df.loc[df['Time'] >= max_datetime]).mark_line(strokeDash=[1, 1]).encode(
+            x=alt.X('Time', axis=alt.Axis(title='', formatType="time", tickColor='white', grid=False, domain=False)),
+            y=alt.Y('value', axis=alt.Axis(title='', tickColor='white', domain=False)),
+            color=alt.Color('variable',
+                            legend=alt.Legend(labelFontSize=14, direction='horizontal', titleAnchor='middle', orient='bottom', title=''),
+                            scale=alt.Scale(domain=domain, range=range_)
+                            )
+        ))
+
+        rect = alt.Chart(df_on_off_times).mark_rect().mark_rect(opacity=0.2).encode(
+            x='start_on_times:T',
+            x2='end_on_times:T'
         )
-        ch_lay = alt.layer(chart, rect).configure_view(strokeWidth=0)
+        ch_lay = alt.layer(chart, pred_chart, rect).configure_view(strokeWidth=0) # chart, pred_chart, rect
         col.altair_chart(ch_lay.interactive(), use_container_width=True)
-    current_time = time.time()
-    print(current_time - last_time, "seconds")
 
 
 def loop_over_params(db, building_param, data_param, room_param, floor_param):
     building_dict, param_dict = utils.get_config_dicts(building_param, data_param)
     time_param_dict = cnf.time_param_dict["Date (last 7 days)"]
-    # {'start_date_utc': (datetime.utcnow() - timedelta(days=7)), 'end_date_utc': (datetime.utcnow())}
     collections = building_dict[param_dict['sites_dict_val']]
+    if collections == []:
+        return pd.DataFrame()
     for i, (collect_name, collect_title) in enumerate(collections):
         if (param_dict['is_rooms']) and (collect_title is not None) and (collect_title != floor_param):
             continue
@@ -80,10 +104,12 @@ def loop_over_params(db, building_param, data_param, room_param, floor_param):
         df_dict = utils.get_cooked_df(db, collect_name, collect_title, building_dict, param_dict, time_param_dict)
         if param_dict['is_rooms']:
             df = df_dict[floor_param][[room_param]]
-            df = df.rename(columns={df.columns[0]: data_param})
+            if len(df.columns) > 0:
+                df = df.rename(columns={df.columns[0]: data_param})
         else:
             df = df_dict[collect_title]
-            df = df.rename(columns={df.columns[0]: collect_title})
+            if len(df.columns) > 0:
+                df = df.rename(columns={df.columns[0]: data_param})
 
         df.index = pd.to_datetime(df.index).round('15min')
 

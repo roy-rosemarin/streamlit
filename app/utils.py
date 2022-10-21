@@ -30,7 +30,7 @@ def get_config_dicts(building_param, data_param, time_param=None):
         return building_dict, param_dict
 
 
-@st.cache(ttl=times.seconds_until_midnight(), show_spinner=False)
+@st.experimental_singleton(show_spinner=False)
 def join_pandas_df_list(dfs_list):
     return ft.reduce(lambda left, right: left.join(right, how='left'), dfs_list)
 
@@ -40,7 +40,7 @@ def get_cooked_df(_db, collect_name, collect_title, building_dict, param_dict, t
     df_dict = {}
 
     df_pd = fbdb.get_firebase_data(_db, collect_name, time_param_dict['start_date_utc'], time_param_dict['end_date_utc'],
-                                   param_dict['field_substring'])
+                                   param_dict['field_keyword'], param_dict['match_keyword'])
 
     if param_dict['is_rooms']:
         rooms_dict = rooms.get_code_to_room_dict(building_dict['rooms_file'])
@@ -55,5 +55,4 @@ def get_cooked_df(_db, collect_name, collect_title, building_dict, param_dict, t
             df_dict[collect_title if collect_title else rooms_title] = dff
     else:
         df_dict[collect_title] = df_pd
-
     return df_dict

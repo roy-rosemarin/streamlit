@@ -5,20 +5,20 @@ import times
 import pandas as pd
 
 
-@st.cache(allow_output_mutation=True, ttl=times.seconds_until_midnight())
+@st.experimental_singleton(show_spinner=False)
 def read_room_file(rooms_mapping_file):
     path = os.path.dirname(__file__)
     return pd.read_csv(os.path.join(path, rooms_mapping_file), encoding='latin-1')
 
 
-@st.cache(allow_output_mutation=True, ttl=times.seconds_until_midnight())
+@st.experimental_singleton(show_spinner=False)
 def get_floor_to_rooms_dict(rooms_mapping_file):
     rooms_df = read_room_file(rooms_mapping_file)
     rooms_df = rooms_df[['ROOM', 'Title']].groupby('Title')['ROOM'].apply(list)
     return rooms_df.to_dict()
 
 
-@st.cache(allow_output_mutation=True, ttl=times.seconds_until_midnight())
+@st.experimental_singleton(show_spinner=False)
 def get_code_to_room_dict(rooms_mapping_file):
     rooms_df = read_room_file(rooms_mapping_file)
     rooms_df = (rooms_df[['Gateway', 'ROOM', 'BACnet reading number', 'Title']]

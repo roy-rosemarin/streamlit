@@ -1,9 +1,20 @@
 from datetime import datetime
 from pytz import timezone
+import streamlit as st
+
+
+def utc_now():
+    return datetime.utcnow()
+
+
+@st.experimental_singleton
+def last_cache_date():
+    return utc_now().strftime('%Y-%m-%d')
 
 
 def localise_time_now(tz):
-    return timezone('UTC').localize(datetime.utcnow()).astimezone(timezone(tz))
+    return timezone('UTC').localize(utc_now()).astimezone(timezone(tz))
+
 
 def convert_datetmie_to_string(start_date_utc, end_date_utc):
     return start_date_utc.strftime('%Y-%m-%dT%H:%M:%S'), end_date_utc.strftime('%Y-%m-%dT%H:%M:%S')
@@ -19,7 +30,7 @@ def format_firebase_doc_id_string(doc_id):
 
 def seconds_until_midnight(dt=None):
     if dt is None:
-        dt = datetime.utcnow()
+        dt = utc_now()
     return ((24 - dt.hour - 1) * 60 * 60) + ((60 - dt.minute - 1) * 60) + (60 - dt.second)
 
 
@@ -28,7 +39,7 @@ def milliseconds_until_midnight(dt=None):
 
 
 def log_time(times, key):
-    now = datetime.utcnow()
+    now = utc_now()
     if times.get('last'):
         times[key] = (now - times['last']).total_seconds()
     else:

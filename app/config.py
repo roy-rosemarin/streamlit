@@ -1,4 +1,5 @@
-from datetime import datetime, timedelta
+from datetime import timedelta
+import times
 
 
 app_version = 1.4
@@ -16,7 +17,7 @@ tabs = ["HEATMAPS", "CHARTS"]
 '''
 data_param_dict maps keys strings to be selected by user (as keys) to a list of parameters:
 sites_dict_val: value to look in sites_dict[site] for the collection(s) name
-field_substring:substrings of the required field within the firebase collection
+field_keyword:substrings of the required field within the firebase collection
 fmt: heatmap text format
 vmin: heatmap scale minimum
 vmax: heatmap scale maximum
@@ -25,7 +26,8 @@ data_param_dict = {
     "Avg. room temperature (°C)": {
         'sites_dict_val': 'VRV_collections',
         'is_rooms': True,
-        'field_substring': ['Room_Temp', 'RoomTemp'],
+        'field_keyword': ['Room_Temp', 'RoomTemp'],
+        'match_keyword': 'substring',  # 'substring' or 'exact' match for field_keyword
         'fmt': '.1f',
         'vmin': 15,
         'vmax': 40
@@ -33,7 +35,8 @@ data_param_dict = {
     "Cooling temperature set point (°C)": {
         'sites_dict_val': 'VRV_setpoint_collections',
         'is_rooms': True,
-        'field_substring': ['SetTempCool'],
+        'field_keyword': ['SetTempCool'],
+        'match_keyword': 'substring',  # 'substring' or 'exact' match for field_keyword
         'fmt': '.1f',
         'vmin': 15,
         'vmax': 40
@@ -41,7 +44,8 @@ data_param_dict = {
     "Heating temperature set point (°C)": {
         'sites_dict_val': 'VRV_setpoint_collections',
         'is_rooms': True,
-        'field_substring': ['SetTempHeat'],
+        'field_keyword': ['SetTempHeat'],
+        'match_keyword': 'substring',  # 'substring' or 'exact' match for field_keyword
         'fmt': '.1f',
         'vmin': 15,
         'vmax': 40
@@ -49,7 +53,8 @@ data_param_dict = {
     'Percentage of A/C usage (%)': {
         'sites_dict_val': 'VRV_collections',
         'is_rooms': True,
-        'field_substring': ['OnOffState', 'State_BI'],
+        'field_keyword': ['OnOffState', 'State_BI'],
+        'match_keyword': 'substring',  # 'substring' or 'exact' match for field_keyword
         'fmt': '0.0%',
         'vmin': 0,
         'vmax': 1
@@ -57,31 +62,38 @@ data_param_dict = {
     'Outside temperature (°C)': {
         'sites_dict_val': 'weather_collection',
         'is_rooms': False,
-        'field_substring': ['temperature'],
+        'field_keyword': ['temperature'],
+        'match_keyword': 'exact',  # 'substring' or 'exact' match for field_keyword
         'fmt': '.1f',
         'vmin': 15,
         'vmax': 40
-    }
+    },
+    '_Outside temperature 3h prediction (°C)': {
+        'sites_dict_val': 'weather_collection',
+        'is_rooms': False,
+        'field_keyword': ['3h_temperature_sim'],
+        'match_keyword': 'exact',  # 'substring' or 'exact' match for field_keyword
+    },
 }
 
 
 # TODO: we need to localise the start_date and end_date
 time_param_dict = {
     "Date (last 7 days)": {
-        'start_date_utc': (datetime.utcnow() - timedelta(days=7)).replace(hour=0, minute=0, second=0, microsecond=0),
-        'end_date_utc': (datetime.utcnow()).replace(hour=0, minute=0, second=0, microsecond=0),
+        'start_date_utc': (times.utc_now() - timedelta(days=7)).replace(hour=0, minute=0, second=0, microsecond=0),
+        'end_date_utc': (times.utc_now()).replace(hour=0, minute=0, second=0, microsecond=0),
         'aggregation_field_name': 'Date',
         'aggregation_strftime': '%Y-%m-%d\n%A'
     },
     "Hour of Day (last 7 days)": {
-        'start_date_utc': (datetime.utcnow() - timedelta(days=7)).replace(hour=0, minute=0, second=0, microsecond=0),
-        'end_date_utc': (datetime.utcnow()).replace(hour=0, minute=0, second=0, microsecond=0),
+        'start_date_utc': (times.utc_now() - timedelta(days=7)).replace(hour=0, minute=0, second=0, microsecond=0),
+        'end_date_utc': (times.utc_now()).replace(hour=0, minute=0, second=0, microsecond=0),
         'aggregation_field_name': 'Hour',
         'aggregation_strftime': '%H'
     },
     "Latest reading": {
-        'start_date_utc': (datetime.utcnow() - timedelta(minutes=15)),
-        'end_date_utc': (datetime.utcnow()),
+        'start_date_utc': (times.utc_now() - timedelta(minutes=15)),
+        'end_date_utc': (times.utc_now()),
         'aggregation_field_name': 'Local time',
         'aggregation_strftime': '%Y-%m-%d %H:%M:%S'
     },
@@ -107,7 +119,7 @@ sites_dict = {
                             ("BMS_Malaga_Climatizacion_Planta_2", "Planta 2"),
                             ("BMS_Malaga_Climatizacion_Planta_3",  "Planta 3"),
                             ("BMS_Malaga_Climatizacion_Planta_4", "Planta 4")],
-        'VRV_setpoint_collections': [('BMS_Seville_Climatizacion_VRV_setpoints', None)],
+        'VRV_setpoint_collections': [],
         'weather_collection': [('weather_Malaga', 'Outside temperature (°C) Malaga')],
         'time_zone': 'Europe/Madrid',
         'rooms_file': "rooms_codes_malaga.csv",

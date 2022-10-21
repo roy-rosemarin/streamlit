@@ -5,14 +5,11 @@ import firebase_admin
 from firebase_admin import credentials, firestore
 import streamlit as st
 from google.oauth2 import service_account
-from google.cloud.firestore_v1.field_path import FieldPath
-import _thread, weakref, google.cloud.firestore_v1.client as gcc
 import times
 
 pd.options.mode.chained_assignment = None  # default='warn'
 
 
-@st.cache(allow_output_mutation=True, ttl=times.seconds_until_midnight())
 def get_db_from_cert_file(cert_file):
     # Use a service account
     try:
@@ -27,41 +24,36 @@ def get_db_from_cert_file(cert_file):
     return firestore.client()
 
 
-@st.cache(allow_output_mutation=True, ttl=times.seconds_until_midnight(), hash_funcs={dict: lambda _: None})
 def get_db_from_firebase_key():
     key_dict = json.loads(st.secrets["firebase_key"])
     creds = service_account.Credentials.from_service_account_info(key_dict)
     return firestore.Client(credentials=creds, project="amro-partners")
 
 
-def _doc_to_pandas_row(doc, field_substring):
+def _doc_to_pandas_row(doc, field_keyword, match_keyword):
     # TODO the sort should (also) be done after using room mapping
     d_vals = dict(sorted(doc.to_dict().items()))
-    # iterate over all items in doc and pull the ones containing one of field_substring elements
-    d_vals_filtered = dict([(k,[v]) for (k,v) in d_vals.items() if any([i in k for i in field_substring])])
+    # iterate over all items in doc and pull the ones containing one of field_keyword elements
+    if match_keyword == 'substring':
+        d_vals_filtered = dict([(k, [v]) for (k, v) in d_vals.items() if any([i in k for i in field_keyword])])
+    elif match_keyword == 'exact':
+        d_vals_filtered = dict([(k, [v]) for (k, v) in d_vals.items() if any([i == k for i in field_keyword])])
     return pd.DataFrame(d_vals_filtered, index=[doc.id])
 
 
-@st.cache(allow_output_mutation=True, ttl=times.seconds_until_midnight(),
-          show_spinner=False,
-          hash_funcs={
-              weakref.KeyedRef: lambda _: None,
-              _thread.LockType: lambda _: None,
-              gcc.Client: lambda _: None,
-          })
-def get_firebase_data(db, collect_name, start_date_utc, end_date_utc, field_substring):
-    def _doc_to_lst(collection, doc):
-        nonlocal df_list, field_substring
-        df_list += [_doc_to_pandas_row(doc, field_substring)]
+@st.experimental_singleton(show_spinner=False)
+def get_firebase_data(_db, collect_name, start_date_utc, end_date_utc, field_keyword, match_keyword):
+    def _doc_to_list(collection, doc):
+        nonlocal df_list, field_keyword, match_keyword
+        df_list += [_doc_to_pandas_row(doc, field_keyword, match_keyword)]
 
     start_date_utc, end_date_utc = times.convert_datetmie_to_string(start_date_utc, end_date_utc)
-    docs = db.collection(collect_name).stream()
 
     df_list = []
-    collection = (db.collection(collect_name)
+    collection = (_db.collection(collect_name)
                   .where('datetime', '>=', start_date_utc)
                   .where('datetime', '<', end_date_utc))
-    stream_collection_loop(collection, _doc_to_lst)
+    stream_collection_loop(collection, _doc_to_list)
     # TODO: remove this utils conversion call once we have a cooked data collection
     return utils.convert_object_cols_to_boolean(pd.concat(df_list))
 
