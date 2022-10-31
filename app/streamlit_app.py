@@ -25,7 +25,7 @@ def set_homepage():
     if 'show_raw_data_heatmaps' not in st.session_state:
         st.session_state.show_raw_data_heatmaps = False
     
-    print(times.last_cache_date())
+    print('*************** last_cache_date:', times.last_cache_date())
     if times.utc_now().strftime('%Y-%m-%d') != times.last_cache_date():
         st.experimental_singleton.clear()
         #st.experimental_memo.clear()
