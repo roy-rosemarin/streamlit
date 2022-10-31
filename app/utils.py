@@ -38,7 +38,6 @@ def join_pandas_df_list(dfs_list):
 @st.experimental_singleton(show_spinner=False)
 def get_cooked_df(_db, collect_name, collect_title, building_dict, param_dict, time_param_dict):
     df_dict = {}
-
     df_pd = fbdb.get_firebase_data(_db, collect_name, time_param_dict['start_date_utc'], time_param_dict['end_date_utc'],
                                    param_dict['field_keyword'], param_dict['match_keyword'])
 

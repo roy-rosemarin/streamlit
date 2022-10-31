@@ -50,6 +50,7 @@ def get_firebase_data(_db, collect_name, start_date_utc, end_date_utc, field_key
     start_date_utc, end_date_utc = times.convert_datetmie_to_string(start_date_utc, end_date_utc)
 
     df_list = []
+    print(0, collect_name)
     collection = (_db.collection(collect_name)
                   .where('datetime', '>=', start_date_utc)
                   .where('datetime', '<', end_date_utc))
@@ -67,7 +68,6 @@ def stream_collection_loop(collection, my_func, **kwargs):
     '''
     cursor = None
     limit = 1000
-
     while True:
         docs = []  # Very important. This frees the memory incurred in the recursion algorithm.
 

@@ -13,6 +13,7 @@ import firebase_database as fbdb
 import utils
 import heatmaps as hmap
 import charts as cha
+import experiments as exp
 
 
 # reboot the web app every midnight (UTC timezone) for up to 365 times
@@ -32,24 +33,33 @@ def set_homepage():
     st.header('TEMPERATURE MONITORING DASHBOARD')
     st.caption(f'Version {cnf.app_version}, release data: {cnf.release_date}')
     utils.line_space([st], [1])
-    tab1, tab2 = st.tabs(cnf.tabs)
-    utils.line_space([tab1, tab2], [3, 3])
+    tab1, tab2, tab3 = st.tabs(cnf.tabs)
+    utils.line_space([tab1, tab2, tab3], [3, 3, 3])
     col11, col12, col13 = tab1.columns([2, 6, 2])
     col21, col22, col23 = tab2.columns([2, 6, 2])
+    col31, col32, col33 = tab3.columns([2, 6, 2])
     tab1_building_param, tab1_data_param, tab1_time_param = hmap.set_params_heatmaps(col11)
     tab2_building_param, tab2_floor_param, tab2_room_param = cha.set_params_charts(col21)
+    tab3_building_param, tab3_floor_param, tab3_room_param = exp.set_params_exp(col31)
     return (col12, tab1_building_param, tab1_data_param, tab1_time_param,
-            col22, tab2_building_param, tab2_floor_param, tab2_room_param)
+            col22, tab2_building_param, tab2_floor_param, tab2_room_param,
+            col32, tab3_building_param, tab3_floor_param, tab3_room_param)
 
 
 def main():
     db = fbdb.get_db_from_firebase_key()  # Set unchanged settings in the app once
     (col12, tab1_building_param, tab1_data_param, tab1_time_param,
-     col22, tab2_building_param, tab2_floor_param, tab2_room_param) = set_homepage()  # Get choice of building
+     col22, tab2_building_param, tab2_floor_param, tab2_room_param,
+     col32, tab3_building_param, tab3_floor_param, tab3_room_param) = set_homepage()  # Get choice of building
     tab1_building_dict, tab1_param_dict, tab1_time_param_dict = utils.get_config_dicts(tab1_building_param, tab1_data_param, tab1_time_param)
 
+    print('cha cha cha cha cha')
     col22.checkbox("Show raw data", value=False, key="show_raw_data_charts")
     cha.run_flow_charts(db, tab2_building_param, tab2_floor_param, tab2_room_param, col22)
+
+    print('exp exp exp exp exp')
+    col32.checkbox("Show raw data", value=False, key="show_raw_data_experiments")
+    exp.run_flow_exp(db, tab3_building_param, tab3_floor_param, tab3_room_param, col32)
 
     collections = tab1_building_dict[tab1_param_dict['sites_dict_val']]
     if not collections:

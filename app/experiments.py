@@ -9,28 +9,55 @@ import times
 import plot
 
 
-def set_params_charts(col):
-    building_param = col.radio('Select building', cnf.sites_dict.keys(), key='chart_building')
+def set_params_exp(col):
+    building_param = col.radio('Select building', cnf.sites_dict.keys(), key='experiment_building')
     building_dict = cnf.sites_dict[building_param]
-    floor_param = col.radio('Select floor', building_dict['floors_order'], key='chart_floor')
+    floor_param = col.radio('Select floor', building_dict['floors_order'], key='experiment_floor')
     floor_to_rooms_dict = rooms.get_floor_to_rooms_dict(building_dict['rooms_file'])
-    room_param = col.selectbox('Select room', sorted(floor_to_rooms_dict[floor_param]), key='chart_room')
+    room_param = col.selectbox('Select room', sorted(floor_to_rooms_dict[floor_param]), key='experiment_room')
     return building_param, floor_param, room_param
 
 
-def run_flow_charts(db, building_param, floor_param, room_param, col):
+def run_flow_exp(db, building_param, floor_param, room_param, col):
+    if col.button('clear'):
+        st.experimental_singleton.clear()
+
     dfs_list = []
     for data_param in cnf.data_param_dict.keys():
-        print(-1, data_param)
+        print('***************', data_param)
         dfs_list += [loop_over_params(db, building_param, data_param, room_param, floor_param)]
 
     df = utils.join_pandas_df_list(dfs_list)
     max_datetime = df.index[-1]
 
-    if st.session_state.show_raw_data_charts:
+    if st.session_state.show_raw_data_experiments:
         col.dataframe(df, use_container_width=True)
     else:
-        col.altair_chart(charts(df, max_datetime).interactive(), use_container_width=True)
+        if col.checkbox("Show simulated line", value=False):
+            diff2outside = df["Avg. room temperature (°C)"] - df["Outside temperature (°C)"]
+            pos_diff2outside = diff2outside.clip(lower=0, upper=None)
+            neg_diff2outside = - diff2outside.clip(lower=None, upper=0)
+            diff2ac = df["Avg. room temperature (°C)"] - df["Cooling temperature set point (°C)"]
+            pos_diff2ac = neg_diff2outside.clip(lower=0, upper=None)
+            neg_diff2ac = - neg_diff2outside.clip(lower=None, upper=0)
+            ac_on = df['Percentage of A/C usage (%)']
+            ac_off = 1 - ac_on
+            df2 = df.copy()
+            df2["Avg. room temperature (°C)"] = (
+                    (ac_off + 0.5 * ac_on) *
+                    (df2["Avg. room temperature (°C)"]
+                     - 0.3 * pos_diff2outside
+                     - 0.2 * neg_diff2outside)
+                    + (0.5 * ac_on) * (df2["Cooling temperature set point (°C)"])
+            )
+            # 1. it still does not make sense to look at pos diff with outdoor
+            # When ac is on and higher temp it does not make send the room gets warner faster then now
+            # discontinuity is still a problem
+
+
+            col.altair_chart(charts(df2, max_datetime).interactive(), use_container_width=True)
+        else:
+            col.altair_chart(charts(df, max_datetime).interactive(), use_container_width=True)
 
 
 def loop_over_params(db, building_param, data_param, room_param, floor_param):
@@ -65,7 +92,6 @@ def loop_over_params(db, building_param, data_param, room_param, floor_param):
 
 
 def yesterday_to_now(df, tz):
-    print('df before cutting: ', df)
     local_time_now = times.localise_time_now(tz) - timedelta(minutes=1)
     # localizing to UTC since otherwise altair will change the timezone to browser timezone or utc (which I selected)
     df.index = (df.index + timedelta(days=1))
@@ -73,7 +99,6 @@ def yesterday_to_now(df, tz):
 
 
 def charts(df, _max_datetime):
-    print('I am in charts, here is df:', df)
     # TODO: Ugly code. Must improve this code, no need for a separate chart for predictions
     df_on_off_times = plot.create_start_end_times(df, 'Percentage of A/C usage (%)')
     pred_row = pd.DataFrame([[None]*len(df.columns)], columns=df.columns, index=[_max_datetime+timedelta(hours=3)])
