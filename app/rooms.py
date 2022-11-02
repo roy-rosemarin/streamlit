@@ -5,20 +5,20 @@ import times
 import pandas as pd
 
 
-@st.experimental_singleton(show_spinner=False)
+@st.experimental_memo(show_spinner=False)
 def read_room_file(rooms_mapping_file):
     path = os.path.dirname(__file__)
     return pd.read_csv(os.path.join(path, rooms_mapping_file), encoding='latin-1')
 
 
-@st.experimental_singleton(show_spinner=False)
+@st.experimental_memo(show_spinner=False)
 def get_floor_to_rooms_dict(rooms_mapping_file):
     rooms_df = read_room_file(rooms_mapping_file)
     rooms_df = rooms_df[['ROOM', 'Title']].groupby('Title')['ROOM'].apply(list)
     return rooms_df.to_dict()
 
 
-@st.experimental_singleton(show_spinner=False)
+@st.experimental_memo(show_spinner=False)
 def get_code_to_room_dict(rooms_mapping_file):
     rooms_df = read_room_file(rooms_mapping_file)
     rooms_df = (rooms_df[['Gateway', 'ROOM', 'BACnet reading number', 'Title']]
@@ -33,7 +33,7 @@ def map_rooms_names(df, rooms_dict, gateway_room_pattern):
         match = re.search(gateway_room_pattern, room_id)
         if match:
             val = (int(match.group(1)), int(match.group(2)))
-            key = rooms_dict[val]
+            key = rooms_dict.get(val)
             if key:
                 new_columns += [key['ROOM']]
                 new_titles += [key['Title']]

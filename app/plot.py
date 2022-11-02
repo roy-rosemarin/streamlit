@@ -48,7 +48,7 @@ def plot_heatmap(df, time_param, plot_parms, title, to_zone, scale, col):
         col.write(fig)
 
 
-@st.experimental_singleton(show_spinner=False)
+@st.experimental_memo(show_spinner=False)
 def create_start_end_times(df, col_name):
     column = df[col_name]
     start_on_times = []

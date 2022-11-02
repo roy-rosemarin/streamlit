@@ -7,7 +7,6 @@ release_date = '21/10/2022'
 test = True
 
 figure_memory_scale = 0.25  # scaling the original seaborn in order to reduce memory usage
-
 cert_file = "amro-partners-firebase-adminsdk-syddx-7de4edb3c4.json"  # certification file for firebase authentication
 
 tabs = ["HEATMAPS", "CHARTS", "EXPERIMENTS"]
@@ -40,15 +39,15 @@ data_param_dict = {
         'vmin': 15,
         'vmax': 40
     },
-    "Heating temperature set point (°C)": {
-        'sites_dict_val': 'VRV_setpoint_collections',
-        'is_rooms': True,
-        'field_keyword': ['SetTempHeat'],
-        'match_keyword': 'substring',  # 'substring' or 'exact' match for field_keyword
-        'fmt': '.1f',
-        'vmin': 15,
-        'vmax': 40
-    },
+    # "Heating temperature set point (°C)": {
+    #     'sites_dict_val': 'VRV_setpoint_collections',
+    #     'is_rooms': True,
+    #     'field_keyword': ['SetTempHeat'],
+    #     'match_keyword': 'substring',  # 'substring' or 'exact' match for field_keyword
+    #     'fmt': '.1f',
+    #     'vmin': 15,
+    #     'vmax': 40
+    # },
     'Percentage of A/C usage (%)': {
         'sites_dict_val': 'VRV_collections',
         'is_rooms': True,
@@ -100,6 +99,16 @@ time_param_dict = {
 
 
 sites_dict = {
+    "Amro Seville pilot": {
+        "VRV_collections": [('BMS_Seville_Climatizacion_VRV', None)],
+        'VRV_setpoint_collections': [('BMS_Seville_Climatizacion_VRV_setpoints', None)],
+        'weather_collection': [('weather_Seville', 'Outside temperature (°C) Seville')],
+        'time_zone': 'Europe/Madrid',
+        'rooms_file': "rooms_codes_seville_exp.csv",
+        'gateway_reg_express': r'MIT([\d]+).[\w.-]+_([\d]+).',
+        'coordinates': (37.37821, -5.97253),
+        'floors_order': ['Control', 'ventilation', 'Occupancy', 'ventilation+Occupancy']
+    },
     "Amro Seville": {
         "VRV_collections": [('BMS_Seville_Climatizacion_VRV', None)],
         'VRV_setpoint_collections': [('BMS_Seville_Climatizacion_VRV_setpoints', None)],
@@ -127,3 +136,7 @@ sites_dict = {
         'floors_order': ["Planta S", "Planta B", "Planta 1", "Planta 2", "Planta 3",  "Planta 4"]
     },
 }
+
+test_build_terms = ['pilot', 'exp']
+test_sites = [s for s in sites_dict.keys() if any([sub in s for sub in test_build_terms])]
+non_test_sites = [s for s in sites_dict.keys() if all([sub not in s for sub in test_build_terms])]

@@ -15,11 +15,12 @@ def line_space(cols_list, lines_list):
 
 
 def convert_object_cols_to_boolean(df):
-    df[df.columns[df.dtypes == 'object']] = (df[df.columns[df.dtypes == 'object']] is True)
+    obj_cols = df[df.columns[df.dtypes == 'object']]
+    obj_cols = (obj_cols is True) or (obj_cols == 'True')
     return df
 
 
-@st.experimental_singleton(show_spinner=False)
+@st.experimental_memo(show_spinner=False)
 def get_config_dicts(building_param, data_param, time_param=None):
     building_dict = cnf.sites_dict[building_param]
     param_dict = cnf.data_param_dict[data_param]
@@ -30,12 +31,12 @@ def get_config_dicts(building_param, data_param, time_param=None):
         return building_dict, param_dict
 
 
-@st.experimental_singleton(show_spinner=False)
+@st.experimental_memo(show_spinner=False)
 def join_pandas_df_list(dfs_list):
     return ft.reduce(lambda left, right: left.join(right, how='left'), dfs_list)
 
 
-@st.experimental_singleton(show_spinner=False)
+@st.experimental_memo(show_spinner=False)
 def get_cooked_df(_db, collect_name, collect_title, building_dict, param_dict, time_param_dict):
     df_dict = {}
     df_pd = fbdb.get_firebase_data(_db, collect_name, time_param_dict['start_date_utc'], time_param_dict['end_date_utc'],
@@ -51,7 +52,10 @@ def get_cooked_df(_db, collect_name, collect_title, building_dict, param_dict, t
             condition = df_pd.columns.get_level_values(0) == rooms_title
             dff = df_pd.loc[:, condition]
             dff.columns = dff.columns.get_level_values(1)
+            # dff['mean'] = dff.mean(axis=1) ############################
             df_dict[collect_title if collect_title else rooms_title] = dff
-    else:
+            #break ############################
+    elif collect_title:
         df_dict[collect_title] = df_pd
+
     return df_dict

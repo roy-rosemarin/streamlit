@@ -14,6 +14,7 @@ import utils
 import heatmaps as hmap
 import charts as cha
 import experiments as exp
+import logging
 
 
 # reboot the web app every midnight (UTC timezone) for up to 365 times
@@ -28,7 +29,7 @@ def set_homepage():
 
     if times.utc_now().strftime('%Y-%m-%d') != times.last_cache_date():
         st.experimental_singleton.clear()
-        #st.experimental_memo.clear()
+        st.experimental_memo.clear()
     
     st.header('TEMPERATURE MONITORING DASHBOARD')
     st.caption(f'Version {cnf.app_version}, release data: {cnf.release_date}')
@@ -52,15 +53,13 @@ def main():
      col22, tab2_building_param, tab2_floor_param, tab2_room_param,
      col32, tab3_building_param, tab3_floor_param, tab3_room_param) = set_homepage()  # Get choice of building
     tab1_building_dict, tab1_param_dict, tab1_time_param_dict = utils.get_config_dicts(tab1_building_param, tab1_data_param, tab1_time_param)
-
-    print('cha cha cha cha cha')
+    ############################
     col22.checkbox("Show raw data", value=False, key="show_raw_data_charts")
     cha.run_flow_charts(db, tab2_building_param, tab2_floor_param, tab2_room_param, col22)
 
-    print('exp exp exp exp exp')
     col32.checkbox("Show raw data", value=False, key="show_raw_data_experiments")
     exp.run_flow_exp(db, tab3_building_param, tab3_floor_param, tab3_room_param, col32)
-
+    ############################
     collections = tab1_building_dict[tab1_param_dict['sites_dict_val']]
     if not collections:
         col12.subheader('Sorry. This data is not available for the site.')

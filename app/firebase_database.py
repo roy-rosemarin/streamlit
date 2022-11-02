@@ -41,7 +41,7 @@ def _doc_to_pandas_row(doc, field_keyword, match_keyword):
     return pd.DataFrame(d_vals_filtered, index=[doc.id])
 
 
-@st.experimental_singleton(show_spinner=False)
+@st.experimental_memo(show_spinner=False)
 def get_firebase_data(_db, collect_name, start_date_utc, end_date_utc, field_keyword, match_keyword):
     def _doc_to_list(collection, doc):
         nonlocal df_list, field_keyword, match_keyword
@@ -50,7 +50,6 @@ def get_firebase_data(_db, collect_name, start_date_utc, end_date_utc, field_key
     start_date_utc, end_date_utc = times.convert_datetmie_to_string(start_date_utc, end_date_utc)
 
     df_list = []
-    print(0, collect_name)
     collection = (_db.collection(collect_name)
                   .where('datetime', '>=', start_date_utc)
                   .where('datetime', '<', end_date_utc))
