@@ -11,4 +11,4 @@ streamlit_autorefresh
 #streamlit-aggrid
 altair
 logging
-sklearn
+#sklearn

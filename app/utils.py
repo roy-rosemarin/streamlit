@@ -8,6 +8,15 @@ import functools as ft
 import pandas as pd
 
 
+def format_row_wise(styler, formatter):
+    for row, row_formatter in formatter.items():
+        row_num = styler.index.get_loc(row)
+
+        for col_num in range(len(styler.columns)):
+            styler._display_funcs[(row_num, col_num)] = row_formatter
+    return styler
+
+
 def line_space(cols_list, lines_list):
     for col, lines in zip(cols_list, lines_list):
         for i in range(lines):
@@ -52,10 +61,11 @@ def get_cooked_df(_db, collect_name, collect_title, building_dict, param_dict, t
             condition = df_pd.columns.get_level_values(0) == rooms_title
             dff = df_pd.loc[:, condition]
             dff.columns = dff.columns.get_level_values(1)
-            # dff['mean'] = dff.mean(axis=1) ############################
             df_dict[collect_title if collect_title else rooms_title] = dff
-            #break ############################
     elif collect_title:
         df_dict[collect_title] = df_pd
 
     return df_dict
+
+
+

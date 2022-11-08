@@ -1,4 +1,4 @@
-from datetime import timedelta
+from datetime import datetime, timedelta
 import times
 
 
@@ -107,7 +107,12 @@ sites_dict = {
         'rooms_file': "rooms_codes_seville_exp.csv",
         'gateway_reg_express': r'MIT([\d]+).[\w.-]+_([\d]+).',
         'coordinates': (37.37821, -5.97253),
-        'floors_order': ['Control', 'ventilation', 'Occupancy', 'ventilation+Occupancy']
+        'floors_order': ['Control',
+                         'Test group A - increased ventilation',
+                         'Test group B - predicted temperatures',
+                         'Test group C - both effects'],
+        'start_date_utc': datetime(2022, 10, 12, 0, 0),
+        'end_date_utc': datetime(2022, 11, 3, 0, 0)
     },
     "Amro Seville": {
         "VRV_collections": [('BMS_Seville_Climatizacion_VRV', None)],
@@ -137,6 +142,33 @@ sites_dict = {
     },
 }
 
-test_build_terms = ['pilot', 'exp']
+test_build_terms = ['pilot', 'exp', 'flight']
 test_sites = [s for s in sites_dict.keys() if any([sub in s for sub in test_build_terms])]
 non_test_sites = [s for s in sites_dict.keys() if all([sub not in s for sub in test_build_terms])]
+
+
+# Experiment settings
+avg_group_time_field_name = 'Average all'  # avg across the group per timestamp
+avg_group_field_name = 'summary avg'  # avg across the group
+num_rooms_field_name = 'Number of rooms'  # number of rooms across the group
+exp_duration_field_name = 'exp duration'  # number of rooms across the group
+elect_consump_name = 'Average electricity consumption (kWh)'  # number of rooms across the group
+elect_cost_name = 'Average electricity cost (€) (ex. VAT)'  # number of rooms across the group
+elect_carbon_name = 'Average carbon footprint (kg CO2)'  # number of rooms across the group
+
+formatters = {num_rooms_field_name: lambda x: f"{round(x)}",
+              "Avg. room temperature (°C)": lambda x: f"{x:.2f}",
+              'Cooling temperature set point (°C)': lambda x: f"{x:.2f}",
+              "Percentage of A/C usage (%)": lambda x: f"{x:.0%}",
+              elect_consump_name: lambda x: f"{x:.2f}",
+              elect_cost_name: lambda x: f"{x:.2f}",
+              elect_carbon_name: lambda x: f"{x:.2f}",
+              }
+
+metrics = ["Avg. room temperature (°C)",
+           "Percentage of A/C usage (%)",
+           elect_consump_name,
+           elect_cost_name,
+           elect_carbon_name]
+
+control_group = "Control"

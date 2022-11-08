@@ -50,7 +50,7 @@ def get_firebase_data(_db, collect_name, start_date_utc, end_date_utc, field_key
     start_date_utc, end_date_utc = times.convert_datetmie_to_string(start_date_utc, end_date_utc)
 
     df_list = []
-    collection = (_db.collection(collect_name)
+    collection = (_db.collection(collect_name).order_by('datetime')
                   .where('datetime', '>=', start_date_utc)
                   .where('datetime', '<', end_date_utc))
     stream_collection_loop(collection, _doc_to_list)
