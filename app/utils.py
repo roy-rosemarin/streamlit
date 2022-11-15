@@ -6,6 +6,19 @@ import rooms
 import google.cloud.firestore_v1.client as gcc
 import functools as ft
 import pandas as pd
+import numpy as np
+
+
+def format_row_wise(df, formatter):
+    styler = df.style.highlight_null(props="color: transparent;")
+    for row, row_formatter in formatter.items():
+        if row not in styler.index:
+            continue
+        row_num = styler.index.get_loc(row)
+
+        for col_num in range(len(styler.columns)):
+            styler._display_funcs[(row_num, col_num)] = row_formatter
+    return styler
 
 
 def line_space(cols_list, lines_list):
@@ -15,7 +28,8 @@ def line_space(cols_list, lines_list):
 
 
 def convert_object_cols_to_boolean(df):
-    df[df.columns[df.dtypes == 'object']] = (df[df.columns[df.dtypes == 'object']] is True)
+    obj_cols = df[df.columns[df.dtypes == 'object']]
+    obj_cols = (obj_cols is True) or (obj_cols == 'True')
     return df
 
 
@@ -38,7 +52,6 @@ def join_pandas_df_list(dfs_list):
 @st.experimental_singleton(show_spinner=False)
 def get_cooked_df(_db, collect_name, collect_title, building_dict, param_dict, time_param_dict):
     df_dict = {}
-
     df_pd = fbdb.get_firebase_data(_db, collect_name, time_param_dict['start_date_utc'], time_param_dict['end_date_utc'],
                                    param_dict['field_keyword'], param_dict['match_keyword'])
 
@@ -53,6 +66,10 @@ def get_cooked_df(_db, collect_name, collect_title, building_dict, param_dict, t
             dff = df_pd.loc[:, condition]
             dff.columns = dff.columns.get_level_values(1)
             df_dict[collect_title if collect_title else rooms_title] = dff
-    else:
+    elif collect_title:
         df_dict[collect_title] = df_pd
+
     return df_dict
+
+
+

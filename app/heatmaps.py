@@ -4,7 +4,7 @@ import utils
 
 
 def set_params_heatmaps(col):
-    building_param = col.radio('Select building', cnf.sites_dict.keys(), key='heatmaps')
+    building_param = col.radio('Select building', cnf.non_test_sites, key='heatmaps')
     data_param = col.radio('Select data', [key for key in cnf.data_param_dict.keys() if not key.startswith('_')])
     time_param = col.radio('Select average by', cnf.time_param_dict.keys())
     return building_param, data_param, time_param

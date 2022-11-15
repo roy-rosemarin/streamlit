@@ -33,7 +33,7 @@ def map_rooms_names(df, rooms_dict, gateway_room_pattern):
         match = re.search(gateway_room_pattern, room_id)
         if match:
             val = (int(match.group(1)), int(match.group(2)))
-            key = rooms_dict[val]
+            key = rooms_dict.get(val)
             if key:
                 new_columns += [key['ROOM']]
                 new_titles += [key['Title']]
