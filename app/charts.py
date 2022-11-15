@@ -32,7 +32,8 @@ def run_flow_charts(db, building_param, floor_param, room_param, col):
 
 def loop_over_params(db, building_param, data_param, room_param, floor_param):
     building_dict, param_dict = utils.get_config_dicts(building_param, data_param)
-    time_param_dict = cnf.time_param_dict["Date (last 7 days)"]
+    time_param_dict = {'start_date_utc': (times.utc_now() - timedelta(days=30)).replace(hour=0, minute=0, second=0, microsecond=0),
+                       'end_date_utc': (times.utc_now()).replace(hour=0, minute=0, second=0, microsecond=0)}
     collections = building_dict[param_dict['sites_dict_val']]
     if collections == []:
         return pd.DataFrame()

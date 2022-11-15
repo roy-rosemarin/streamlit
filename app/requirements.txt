@@ -10,5 +10,5 @@ streamlit_autorefresh
 #google-cloud-firestore
 #streamlit-aggrid
 altair
-logging
+#logging
 #sklearn

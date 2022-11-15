@@ -6,10 +6,14 @@ import rooms
 import google.cloud.firestore_v1.client as gcc
 import functools as ft
 import pandas as pd
+import numpy as np
 
 
-def format_row_wise(styler, formatter):
+def format_row_wise(df, formatter):
+    styler = df.style.highlight_null(props="color: transparent;")
     for row, row_formatter in formatter.items():
+        if row not in styler.index:
+            continue
         row_num = styler.index.get_loc(row)
 
         for col_num in range(len(styler.columns)):

@@ -1,41 +1,41 @@
 ,Gateway,ROOM, ADDRESS,BACnet reading number,Title
 0,1,823B,PEFY-P20VMA-E,112,Control
-1,1,805,PEFY-P20VMA-E,135,Test group C - both ventilation effects
-2,1,808,PEFY-P20VMA-E,141,Test group C - both ventilation effects
-3,2,701A,PEFY-P20VMA-E,101,Test group A - increased ventilation
-4,2,723E,PEFY-P20VMA-E,110,Test group A - increased ventilation
-5,2,722B,PEFY-P20VMA-E,114,Test group C - both ventilation effects
+1,1,805,PEFY-P20VMA-E,135,Control
+2,1,808,PEFY-P20VMA-E,141,Control
+3,2,701A,PEFY-P20VMA-E,101,Test
+4,2,723E,PEFY-P20VMA-E,110,Test
+5,2,722B,PEFY-P20VMA-E,114,Control
 6,2,721A,PEFY-P20VMA-E,124,Control
-7,2,713B,PEFY-P20VMA-E,125,Test group A - increased ventilation
-8,2,715,PEFY-P20VMA-E,127,Test group C - both ventilation effects
-9,2,719,PEFY-P20VMA-E,129,Test group B - ventilation temperature
-10,2,705,PEFY-P20VMA-E,135,Test group A - increased ventilation
-11,2,704,PEFY-P20VMA-E,138,Test group A - increased ventilation
-12,3,622A,PEFY-P20VMA-E,113,Test group B - ventilation temperature
+7,2,713B,PEFY-P20VMA-E,125,Test
+8,2,715,PEFY-P20VMA-E,127,Control
+9,2,719,PEFY-P20VMA-E,129,Test
+10,2,705,PEFY-P20VMA-E,135,Test
+11,2,704,PEFY-P20VMA-E,138,Test
+12,3,622A,PEFY-P20VMA-E,113,Test
 13,3,622B,PEFY-P20VMA-E,114,Control
-14,3,623C,PEFY-P20VMA-E,116,Test group A - increased ventilation
+14,3,623C,PEFY-P20VMA-E,116,Test
 15,3,621A,PEFY-P20VMA-E,119,Control
 16,3,615,PEFY-P20VMA-E,122,Control
-17,3,619,PEFY-P20VMA-E,124,Test group B - ventilation temperature
+17,3,619,PEFY-P20VMA-E,124,Test
 18,3,608,PEFY-P20VMA-E,136,Control
 19,4,508,PEFY-P20VMA-E,122,Control
-20,4,405,PEFY-P20VMA-E,138,Test group C - both ventilation effects
-21,4,402,PEFY-P20VMA-E,139,Test group B - ventilation temperature
+20,4,405,PEFY-P20VMA-E,138,Control
+21,4,402,PEFY-P20VMA-E,139,Test
 22,5,401B,PEFY-P20VMA-E,102,Control
-23,5,323D,PEFY-P20VMA-E,125,Test group B - ventilation temperature
-24,5,323C,PEFY-P20VMA-E,130,Test group A - increased ventilation
-25,5,311A,PEFY-P20VMA-E,142,Test group B - ventilation temperature
-26,5,303,PEFY-P20VMA-E,146,Test group B - ventilation temperature
-27,6,223C,PEFY-P20VMA-E,116,Test group B - ventilation temperature
-28,6,213A,PEFY-P20VMA-E,121,Test group B - ventilation temperature
-29,6,204,PEFY-P20VMA-E,133,Test group C - both ventilation effects
-30,6,102,PEFY-P20VMA-E,142,Test group C - both ventilation effects
-31,6,103,PEFY-P20VMA-E,143,Test group C - both ventilation effects
-32,7,121A,PEFY-P20VMA-E,135,Test group B - ventilation temperature
-33,7,113B,PEFY-P20VMA-E,136,Test group A - increased ventilation
+23,5,323D,PEFY-P20VMA-E,125,Test
+24,5,323C,PEFY-P20VMA-E,130,Test
+25,5,311A,PEFY-P20VMA-E,142,Test
+26,5,303,PEFY-P20VMA-E,146,Test
+27,6,223C,PEFY-P20VMA-E,116,Test
+28,6,213A,PEFY-P20VMA-E,121,Test
+29,6,204,PEFY-P20VMA-E,133,Control
+30,6,102,PEFY-P20VMA-E,142,Control
+31,6,103,PEFY-P20VMA-E,143,Control
+32,7,121A,PEFY-P20VMA-E,135,Test
+33,7,113B,PEFY-P20VMA-E,136,Test
 34,7,120,PEFY-P50VMA-E,141,Control
-35,8,112B,PEFY-P20VMA-E,102,Test group A - increased ventilation
-36,8,312A,PEFY-P20VMA-E,111,Test group C - both ventilation effects
+35,8,112B,PEFY-P20VMA-E,102,Test
+36,8,312A,PEFY-P20VMA-E,111,Control
 37,8,612B,PEFY-P20VMA-E,127,Control
-38,8,111E,PEFY-P20VMA-E,137,Test group A - increased ventilation
-39,8,123B,PEFY-P20VMA-E,142,Test group C - both ventilation effects
+38,8,111E,PEFY-P20VMA-E,137,Test
+39,8,123B,PEFY-P20VMA-E,142,Control
