@@ -20,7 +20,7 @@ def set_params_exp(col):
     return building_param, metric_param, time_param
 
 
-@st.experimental_memo(show_spinner=False)
+@st.experimental_singleton(show_spinner=False)
 def set_exp_settings(_db, building_param):
     df_dict_param = {}  # dict of structure: {data_param -> floor_param or collection title --> df of all rooms}
     for data_param in cnf.data_param_dict.keys():
@@ -45,7 +45,7 @@ def set_exp_settings(_db, building_param):
     return df_dict_room
 
 
-@st.experimental_memo(show_spinner=False)
+@st.experimental_singleton(show_spinner=False)
 def sim_df_dict(building_param, _df_dict_room, _start_exp_date_utc, _groups=[], _funcs=[]):
     building_dict = cnf.sites_dict[building_param]
     floor_to_rooms_dict = rooms.get_floor_to_rooms_dict(building_dict['rooms_file'])
@@ -63,7 +63,7 @@ def sim_df_dict(building_param, _df_dict_room, _start_exp_date_utc, _groups=[], 
     return _df_dict_room
 
 
-@st.experimental_memo(show_spinner=False)
+@st.experimental_singleton(show_spinner=False)
 def add_avg_group(building_param, _df_dict_room):
     building_dict = cnf.sites_dict[building_param]
     floor_to_rooms_dict = rooms.get_floor_to_rooms_dict(building_dict['rooms_file'])
@@ -185,7 +185,7 @@ def run_summary_exp(df_dict_room, building_param, metric_param, time_param, col)
         col.altair_chart(chart.interactive(), use_container_width=True)
 
 
-@st.experimental_memo(show_spinner=False)
+@st.experimental_singleton(show_spinner=False)
 def read_data_into_df_dict_param(_db, building_param, data_param):
     building_dict, param_dict = utils.get_config_dicts(building_param, data_param)
     time_param_dict = building_dict  # building_dict has the only required fields start_date_utc and end_date_utc

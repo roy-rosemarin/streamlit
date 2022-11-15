@@ -32,9 +32,6 @@ def set_homepage():
 
     st.header('TEMPERATURE MONITORING DASHBOARD')
     st.caption(f'Version {cnf.app_version}, release data: {cnf.release_date}')
-    if st.button('Refresh'):
-        st.experimental_singleton.clear()
-        st.experimental_memo.clear()
 
     utils.line_space([st], [1])
     tab1, tab2, tab3 = st.tabs(cnf.tabs)

@@ -4,7 +4,7 @@ import streamlit as st
 
 
 def utc_now():
-    return datetime.utcnow()
+    return datetime(2022, 11, 15, 0, 0)  ################  TODO: change back to datetime.utcnow()
 
 
 @st.experimental_singleton

@@ -33,7 +33,7 @@ def convert_object_cols_to_boolean(df):
     return df
 
 
-@st.experimental_memo(show_spinner=False)
+@st.experimental_singleton(show_spinner=False)
 def get_config_dicts(building_param, data_param, time_param=None):
     building_dict = cnf.sites_dict[building_param]
     param_dict = cnf.data_param_dict[data_param]
@@ -44,12 +44,12 @@ def get_config_dicts(building_param, data_param, time_param=None):
         return building_dict, param_dict
 
 
-@st.experimental_memo(show_spinner=False)
+@st.experimental_singleton(show_spinner=False)
 def join_pandas_df_list(dfs_list):
     return ft.reduce(lambda left, right: left.join(right, how='left'), dfs_list)
 
 
-@st.experimental_memo(show_spinner=False)
+@st.experimental_singleton(show_spinner=False)
 def get_cooked_df(_db, collect_name, collect_title, building_dict, param_dict, time_param_dict):
     df_dict = {}
     df_pd = fbdb.get_firebase_data(_db, collect_name, time_param_dict['start_date_utc'], time_param_dict['end_date_utc'],
