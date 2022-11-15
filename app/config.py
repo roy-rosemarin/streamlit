@@ -10,7 +10,7 @@ test = True
 figure_memory_scale = 0.25  # scaling the original seaborn in order to reduce memory usage
 cert_file = "amro-partners-firebase-adminsdk-syddx-7de4edb3c4.json"  # certification file for firebase authentication
 
-tabs = ["HEATMAPS", "CHARTS", "EXPERIMENTS"]
+tabs = ["HEATMAPS", "CHARTS"] # , "EXPERIMENTS"]
 
 
 '''
