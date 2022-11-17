@@ -9,7 +9,7 @@ import plot
 import simulate as sim
 import altair as alt
 from pytz import timezone
-import scipy
+#import scipy
 
 
 def set_params_exp(col):
