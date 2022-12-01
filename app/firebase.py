@@ -2,22 +2,23 @@ import json
 import pandas as pd
 import utils
 import firebase_admin
-from firebase_admin import credentials, firestore
+from firebase_admin import credentials, firestore, storage
 import streamlit as st
 from google.oauth2 import service_account
 import times
+import pickle
 
 pd.options.mode.chained_assignment = None  # default='warn'
 
 
-def get_db_from_cert_file(cert_file):
+def get_db_from_cert_file(cert_file, storage_bucket):
     # Use a service account
     try:
         app = firebase_admin.get_app()
     except ValueError as e:
         cred = credentials.Certificate(cert_file)
         try:
-            firebase_admin.initialize_app(cred)
+            firebase_admin.initialize_app(cred, {'storageBucket': storage_bucket})
         except ValueError as e:
             pass
 
@@ -41,7 +42,7 @@ def _doc_to_pandas_row(doc, field_keyword, match_keyword):
     return pd.DataFrame(d_vals_filtered, index=[doc.id])
 
 
-@st.experimental_singleton(show_spinner=False)
+@st.experimental_memo(show_spinner=False)
 def get_firebase_data(_db, collect_name, start_date_utc, end_date_utc, field_keyword, match_keyword):
     def _doc_to_list(collection, doc):
         nonlocal df_list, field_keyword, match_keyword
@@ -84,3 +85,8 @@ def stream_collection_loop(collection, my_func, **kwargs):
             continue
 
         break
+
+
+@st.experimental_memo(show_spinner=False)
+def read_and_unpickle(file_name, bucket_name=None):
+    return pickle.loads(storage.bucket(bucket_name).blob(file_name).download_as_string(timeout=300))

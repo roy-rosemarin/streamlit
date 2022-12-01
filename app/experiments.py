@@ -2,14 +2,9 @@ import rooms
 import pandas as pd
 import config as cnf
 import utils
-from datetime import datetime, timedelta
 import streamlit as st
-import times
-import plot
-import simulate as sim
 import altair as alt
 from pytz import timezone
-import scipy
 
 
 def set_params_exp(col):
@@ -20,32 +15,8 @@ def set_params_exp(col):
     return building_param, metric_param, time_param
 
 
-@st.experimental_singleton(show_spinner=False)
-def set_exp_settings(_db, building_param):
-    df_dict_param = {}  # dict of structure: {data_param -> floor_param or collection title --> df of all rooms}
-    for data_param in cnf.data_param_dict.keys():
-        df_dict_param[data_param] = read_data_into_df_dict_param(_db, building_param, data_param)
-        building_dict = cnf.sites_dict[building_param]
 
-        for k, v in df_dict_param[data_param].items():
-            # transform times of each extracted dataframe
-            v_new = transform_times(v, building_dict['time_zone'])
-            df_dict_param[data_param][k] = v_new
-
-    df_dict_room = {}  # dict of structure: {floor_param or collection title -> room --> df of all params}
-    floor_to_rooms_dict = rooms.get_floor_to_rooms_dict(building_dict['rooms_file'])
-    for floor_param in building_dict['floors_order']:
-        df_dict_room[floor_param] = {}
-        for room_param in floor_to_rooms_dict[floor_param]:
-            dfs_list = []
-            for data_param in cnf.data_param_dict.keys():
-                dfs_list += [extract_room_data(df_dict_param[data_param], building_param, data_param, room_param, floor_param)]
-            df_dict_room[floor_param][room_param] = utils.join_pandas_df_list(dfs_list)
-
-    return df_dict_room
-
-
-@st.experimental_singleton(show_spinner=False)
+@st.experimental_memo(show_spinner=False)
 def sim_df_dict(building_param, _df_dict_room, _start_exp_date_utc, _groups=[], _funcs=[]):
     building_dict = cnf.sites_dict[building_param]
     floor_to_rooms_dict = rooms.get_floor_to_rooms_dict(building_dict['rooms_file'])
@@ -63,7 +34,7 @@ def sim_df_dict(building_param, _df_dict_room, _start_exp_date_utc, _groups=[], 
     return _df_dict_room
 
 
-@st.experimental_singleton(show_spinner=False)
+@st.experimental_memo(show_spinner=False)
 def add_avg_group(building_param, _df_dict_room):
     building_dict = cnf.sites_dict[building_param]
     floor_to_rooms_dict = rooms.get_floor_to_rooms_dict(building_dict['rooms_file'])
@@ -95,18 +66,6 @@ def add_avg_group(building_param, _df_dict_room):
         _df_dict_room[floor_param][cnf.ste_post_field_name] = df_sum_post.sem()
 
     return _df_dict_room
-
-
-def get_rooms_dict(_db, building_param):
-    df_dict_room = set_exp_settings(_db, building_param)
-    df_dict_room = sim_df_dict(building_param, df_dict_room,
-                               _start_exp_date_utc=cnf.sites_dict[building_param]['start_exp_date_utc'],
-                               # Apply simulation effect on cnf.sites_dict[building_param]['floors_order'][1:]
-                               _groups=[(cnf.sites_dict[building_param]['floors_order'][1:])],
-                               _funcs=[sim.sim_test_vent])
-    df_dict_room = add_avg_group(building_param, df_dict_room)
-
-    return df_dict_room
 
 
 def run_summary_exp(df_dict_room, building_param, metric_param, time_param, col):
@@ -183,59 +142,3 @@ def run_summary_exp(df_dict_room, building_param, metric_param, time_param, col)
 
         col.table(df_sum)
         col.altair_chart(chart.interactive(), use_container_width=True)
-
-
-@st.experimental_singleton(show_spinner=False)
-def read_data_into_df_dict_param(_db, building_param, data_param):
-    building_dict, param_dict = utils.get_config_dicts(building_param, data_param)
-    time_param_dict = building_dict  # building_dict has the only required fields start_date_utc and end_date_utc
-    collections = building_dict[param_dict['sites_dict_val']]
-
-    df_dict_param = {}
-    for i, (collect_name, collect_title) in enumerate(collections):
-        df_dict_param.update(utils.get_cooked_df(_db, collect_name, collect_title, building_dict, param_dict, time_param_dict))
-
-    if '' in df_dict_param:
-        del df_dict_param['']
-
-    return df_dict_param
-
-
-def extract_room_data(df_dict, building_param, data_param, room_param, floor_param):
-    building_dict, param_dict = utils.get_config_dicts(building_param, data_param)
-    collections = building_dict[param_dict['sites_dict_val']]
-
-    if collections == []:
-        return pd.DataFrame()
-    for i, (collect_name, collect_title) in enumerate(collections):
-        if (param_dict['is_rooms']) and (collect_title is not None) and (collect_title != floor_param):
-            continue
-
-        if param_dict['is_rooms']:
-            df = df_dict[floor_param][[room_param]]
-            if len(df.columns) > 0:
-                df = df.rename(columns={df.columns[0]: data_param})
-                break
-        else:
-            df = df_dict[collect_title]
-            if len(df.columns) > 0:
-                df = df.rename(columns={df.columns[0]: data_param})
-    return df
-
-
-def transform_times(df, time_zone):
-    df.index = pd.to_datetime(df.index).round('15min')
-
-    if time_zone is not None:
-        df.index = times.change_pd_time_zone(pd.DatetimeIndex(df.index), 'UTC', time_zone)
-
-    df = df.fillna(method="ffill").fillna(method="bfill")
-    df = yesterday_to_now(df, time_zone)
-    return df
-
-
-def yesterday_to_now(df, tz):
-    local_time_now = times.localise_time_now(tz) - timedelta(minutes=1)
-    # localizing to UTC since otherwise altair will change the timezone to browser timezone or utc (which I selected)
-    df.index = (df.index + timedelta(days=1))
-    return df[df.index <= local_time_now]

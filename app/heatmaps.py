@@ -10,9 +10,8 @@ def set_params_heatmaps(col):
     return building_param, data_param, time_param
 
 
-def run_flow_heatmaps(db, collect_name, collect_title, building_param, data_param, time_param, col):
+def run_plots_heatmaps(df_dict, building_param, data_param, time_param, col):
     building_dict, param_dict, time_param_dict = utils.get_config_dicts(building_param, data_param, time_param)
-    df_dict = utils.get_cooked_df(db, collect_name, collect_title, building_dict, param_dict, time_param_dict)
     for i, (title, df) in enumerate(df_dict.items()):
         plot.plot_heatmap(
             df=df,

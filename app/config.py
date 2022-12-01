@@ -9,8 +9,9 @@ test = True
 
 figure_memory_scale = 0.25  # scaling the original seaborn in order to reduce memory usage
 cert_file = "amro-partners-firebase-adminsdk-syddx-7de4edb3c4.json"  # certification file for firebase authentication
+storage_bucket = 'amro-partners.appspot.com'
 
-tabs = ["HEATMAPS", "CHARTS"] # , "EXPERIMENTS"]
+tabs = ["HEATMAPS", "CHARTS", "EXPERIMENTS"]
 
 
 '''
@@ -70,7 +71,7 @@ data_param_dict = {
     '_Outside temperature 3h prediction (°C)': {
         'sites_dict_val': 'weather_collection',
         'is_rooms': False,
-        'field_keyword': ['3h_temperature_sim'],
+        'field_keyword': ['3h_temperature_interp'],
         'match_keyword': 'exact',  # 'substring' or 'exact' match for field_keyword
     },
 }
@@ -90,12 +91,12 @@ time_param_dict = {
         'aggregation_field_name': 'Hour',
         'aggregation_strftime': '%H'
     },
-    "Latest reading": {
-        'start_date_utc': (times.utc_now() - timedelta(minutes=15)),
-        'end_date_utc': (times.utc_now()),
-        'aggregation_field_name': 'Local time',
-        'aggregation_strftime': '%Y-%m-%d %H:%M:%S'
-    },
+    # "Latest reading": {
+    #     'start_date_utc': (times.utc_now() - timedelta(minutes=15)),
+    #     'end_date_utc': (times.utc_now()),
+    #     'aggregation_field_name': 'Local time',
+    #     'aggregation_strftime': '%Y-%m-%d %H:%M:%S'
+    # },
 }
 
 
