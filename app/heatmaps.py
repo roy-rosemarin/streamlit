@@ -3,11 +3,12 @@ import config as cnf
 import utils
 
 
-def set_params_heatmaps(col):
-    building_param = col.radio('Select building', cnf.non_test_sites, key='heatmaps')
-    data_param = col.radio('Select data', [key for key in cnf.data_param_dict.keys() if not key.startswith('_')])
-    time_param = col.radio('Select average by', cnf.time_param_dict.keys())
-    return building_param, data_param, time_param
+def set_params_heatmaps(col1, col2):
+    building_param = col1.radio('Select building', cnf.non_test_sites, key='hmaps_building')
+    data_param = col1.radio('Select data', [key for key in cnf.data_param_dict.keys() if not key.startswith('_')], key='hmaps_data')
+    time_param = col1.radio('Select average by', cnf.time_param_dict.keys(), key='hmaps_time')
+    raw_data = col2.checkbox("Show raw data", value=False, key="hmaps_raw_data")
+    return building_param, data_param, time_param, raw_data
 
 
 def run_plots_heatmaps(df_dict, building_param, data_param, time_param, col):

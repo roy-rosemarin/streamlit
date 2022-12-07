@@ -1,5 +1,6 @@
 import rooms
 import pandas as pd
+import times
 import config as cnf
 import utils
 import streamlit as st
@@ -7,19 +8,20 @@ import altair as alt
 from pytz import timezone
 
 
-def set_params_exp(col):
-    building_param = col.radio('Select Flight', cnf.test_sites, key='experiment_building')
+def set_params_exp(col1, col2):
+    building_param = col1.radio('Select Flight', cnf.test_sites, key='exp_building')
     building_dict = cnf.sites_dict[building_param]
-    metric_param = col.radio('Select chart metric',  cnf.metrics, key='experiment_chart_metric')
-    time_param = col.radio('Select chart frequency',  cnf.time_agg_dict.keys(), key='experiment_chart_freq')
-    return building_param, metric_param, time_param
+    metric_param = col1.radio('Select chart metric',  cnf.metrics, key='exp_chart_metric')
+    time_param = col1.radio('Select chart frequency',  cnf.time_agg_dict.keys(), key='exp_chart_freq')
+    raw_data = col2.checkbox("Show raw data", value=False, key="exp_raw_data")
+    return building_param, metric_param, time_param, raw_data
 
 
 
 @st.experimental_memo(show_spinner=False)
 def sim_df_dict(building_param, _df_dict_room, _start_exp_date_utc, _groups=[], _funcs=[]):
     building_dict = cnf.sites_dict[building_param]
-    floor_to_rooms_dict = rooms.get_floor_to_rooms_dict(building_dict['rooms_file'])
+    floor_to_rooms_dict = rooms.get_floor_to_rooms_dict(building_dict['rooms_file'], building_dict['floors_col'])
     for group, func in zip(_groups, _funcs):
         for floor_param in building_dict['floors_order']:
             if floor_param in group:
@@ -37,19 +39,19 @@ def sim_df_dict(building_param, _df_dict_room, _start_exp_date_utc, _groups=[], 
 @st.experimental_memo(show_spinner=False)
 def add_avg_group(building_param, _df_dict_room):
     building_dict = cnf.sites_dict[building_param]
-    floor_to_rooms_dict = rooms.get_floor_to_rooms_dict(building_dict['rooms_file'])
+    floor_to_rooms_dict = rooms.get_floor_to_rooms_dict(building_dict['rooms_file'], building_dict['floors_col'])
     for floor_param in building_dict['floors_order']:
-        df_list = []
+        df_rooms_list = []
         for room_param in floor_to_rooms_dict[floor_param]:
-            df_list += [_df_dict_room[floor_param][room_param]]
+            df_rooms_list += [_df_dict_room[floor_param][room_param]]
 
         _df_dict_room[floor_param][cnf.num_rooms_field_name] = len(_df_dict_room[floor_param])
-        flight_duration = building_dict['end_date_utc'] - building_dict['start_date_utc']
+        flight_duration = min(building_dict['end_exp_date_utc'], times.utc_now()) - building_dict['start_exp_date_utc']
         _df_dict_room[floor_param][cnf.exp_duration_field_name] = f'Flight duration: {flight_duration.days} days ' \
                                                               f'{flight_duration.seconds // 3600} hours ' \
                                                               f'{flight_duration.seconds%3600//60} minutes'
 
-        df_concat = pd.concat(df_list)
+        df_concat = pd.concat(df_rooms_list)
         df_sum = df_concat.groupby(df_concat.index).mean()
         df_sum[cnf.elect_consump_name] = ((2.58 / 0.4 / (24*4)) * flight_duration.days
                                           * df_sum['Percentage of A/C usage (%)'])
@@ -67,6 +69,39 @@ def add_avg_group(building_param, _df_dict_room):
 
     return _df_dict_room
 
+
+@st.experimental_memo(show_spinner=False)
+def add_avg_group(building_param, _df_dict_room):
+    building_dict = cnf.sites_dict[building_param]
+    floor_to_rooms_dict = rooms.get_floor_to_rooms_dict(building_dict['rooms_file'], building_dict['floors_col'])
+    for floor_param in building_dict['floors_order']:
+        df_rooms_list = []
+        for room_param in floor_to_rooms_dict[floor_param]:
+            df_rooms_list += [_df_dict_room[floor_param][room_param]]
+
+        _df_dict_room[floor_param][cnf.num_rooms_field_name] = len(_df_dict_room[floor_param])
+        flight_duration = min(building_dict['end_exp_date_utc'], times.utc_now()) - building_dict['start_exp_date_utc']
+        _df_dict_room[floor_param][cnf.exp_duration_field_name] = f'Flight duration: {flight_duration.days} days ' \
+                                                              f'{flight_duration.seconds // 3600} hours ' \
+                                                              f'{flight_duration.seconds%3600//60} minutes'
+
+        df_concat = pd.concat(df_rooms_list)
+        df_sum = df_concat.groupby(df_concat.index).mean()
+        df_sum[cnf.elect_consump_name] = ((2.58 / 0.4 / (24*4)) * flight_duration.days
+                                          * df_sum['Percentage of A/C usage (%)'])
+        df_sum[cnf.elect_cost_name] = 0.136 * df_sum[cnf.elect_consump_name]
+        df_sum[cnf.elect_carbon_name] = 0.3381 * df_sum[cnf.elect_consump_name]
+        _df_dict_room[floor_param][cnf.avg_group_time_field_name] = df_sum
+
+        t = building_dict['start_exp_date_utc'].astimezone(timezone(building_dict['time_zone']))
+        df_sum_pre = df_sum.loc[df_sum.index < t]
+        df_sum_post = df_sum.loc[df_sum.index >= t]
+
+        _df_dict_room[floor_param][cnf.avg_pre_field_name] = df_sum_pre.mean()
+        _df_dict_room[floor_param][cnf.avg_post_field_name] = df_sum_post.mean()
+        _df_dict_room[floor_param][cnf.ste_post_field_name] = df_sum_post.sem()
+
+    return _df_dict_room
 
 def run_summary_exp(df_dict_room, building_param, metric_param, time_param, col):
     floor_dict = df_dict_room[cnf.test_group]
@@ -97,8 +132,7 @@ def run_summary_exp(df_dict_room, building_param, metric_param, time_param, col)
     df_sum3.columns = ['95%  C.I.']
     df_sum2['95%  C.I.'] = df_sum3['95%  C.I.']
     df_sum2['95%  C.I.'] = list(zip(df_sum2['Difference'] - 10*df_sum2['95%  C.I.'], df_sum2['Difference'] + 10*df_sum2['95%  C.I.']))
-
-    df_sum = df_sum.append(df_sum2)
+    df_sum = pd.concat([df_sum, df_sum2], ignore_index=True)
 
     #df_sum = df_sum.style.highlight_null(props="color: transparent;")
     df_sum = utils.format_row_wise(df_sum, cnf.formatters)
@@ -136,7 +170,7 @@ def run_summary_exp(df_dict_room, building_param, metric_param, time_param, col)
 
 
     col.text(floor_dict[cnf.exp_duration_field_name])
-    if st.session_state.show_raw_data_experiments:
+    if st.session_state.exp_raw_data:
         col.dataframe(df_t, use_container_width=True)
     else:
 

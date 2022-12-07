@@ -101,50 +101,33 @@ time_param_dict = {
 
 
 sites_dict = {
-    "Amro Seville temperature prediction pilot": {
+    # "Amro Seville fan speed pilot CL01": {
+    #     "VRV_collections": [('BMS_Seville_Climatizacion_VRV', None)],
+    #     'VRV_setpoint_collections': [('BMS_Seville_Climatizacion_VRV_setpoints', None)],
+    #     'weather_collection': [('weather_Seville', 'Outside temperature (°C) Seville')],
+    #     'time_zone': 'Europe/Madrid',
+    #     'rooms_file': "rooms_codes_seville_CL01_exp.csv",
+    #     'gateway_reg_express': r'MIT([\d]+).[\w.-]+_([\d]+).',
+    #     'coordinates': (37.37821, -5.97253),
+    #     'floors_order': ['Control',
+    #                      'Test'],
+    #     'floors_col': 'Group',
+    #     'start_exp_date_utc': datetime(2022, 12, 2, 12, 0),
+    #     'end_exp_date_utc': datetime(2022, 12, 30, 12, 0)
+    # },
+    "Amro Seville ventilation temp pilot CL02": {
         "VRV_collections": [('BMS_Seville_Climatizacion_VRV', None)],
         'VRV_setpoint_collections': [('BMS_Seville_Climatizacion_VRV_setpoints', None)],
         'weather_collection': [('weather_Seville', 'Outside temperature (°C) Seville')],
         'time_zone': 'Europe/Madrid',
-        'rooms_file': "rooms_codes_seville_exp.csv",
+        'rooms_file': "rooms_codes_seville_CL02_exp.csv",
         'gateway_reg_express': r'MIT([\d]+).[\w.-]+_([\d]+).',
         'coordinates': (37.37821, -5.97253),
         'floors_order': ['Control',
                          'Test'],
-        # 'Test group B - predicted temperatures',
-        # 'Test group C - both effects'],
-        'start_date_utc': datetime(2022, 10, 13, 9, 16),
-        'start_exp_date_utc': datetime(2022, 10, 13, 9, 16),  # add 1 day + 2 hours forward for the simulations
-        'end_date_utc': datetime(2022, 11, 10, 0, 0),
-        # 'start_date_utc': datetime(2022, 10, 11, 9, 16),
-        # 'start_exp_date_utc': datetime(2022, 10, 11, 9, 16),  # add 1 day + 2 hours forward for the simulations
-        # 'end_date_utc': datetime(2022, 10, 15, 0, 0),
-        'shrink_ac_threshold': 5,
-        'pos_diff2outside_coef': 0,
-        ''
-        'is_gradual': False
-    },
-    "Amro Seville ventilation pilot": {
-        "VRV_collections": [('BMS_Seville_Climatizacion_VRV', None)],
-        'VRV_setpoint_collections': [('BMS_Seville_Climatizacion_VRV_setpoints', None)],
-        'weather_collection': [('weather_Seville', 'Outside temperature (°C) Seville')],
-        'time_zone': 'Europe/Madrid',
-        'rooms_file': "rooms_codes_seville_exp2.csv",
-        'gateway_reg_express': r'MIT([\d]+).[\w.-]+_([\d]+).',
-        'coordinates': (37.37821, -5.97253),
-        'floors_order': ['Control',
-                         'Test'],
-                         # 'Test group B - predicted temperatures',
-                         # 'Test group C - both effects'],
-        'start_date_utc': datetime(2022, 10, 11, 9, 16),
-        'start_exp_date_utc': datetime(2022, 10, 11, 9, 16),  # add 1 day + 2 hours forward for the simulations
-        'end_date_utc': datetime(2022, 11, 3, 0, 0),
-        # 'start_date_utc': datetime(2022, 10, 11, 9, 16),
-        # 'start_exp_date_utc': datetime(2022, 10, 11, 9, 16),  # add 1 day + 2 hours forward for the simulations
-        # 'end_date_utc': datetime(2022, 10, 15, 0, 0),
-        'shrink_ac_threshold': 0.5,
-        'pos_diff2outside_coef': 0.3,
-        'is_gradual': True
+        'floors_col': 'Group',
+        'start_exp_date_utc': datetime(2022, 12, 2, 12, 0),
+        'end_exp_date_utc': datetime(2022, 12, 30, 12, 0)
     },
     "Amro Seville": {
         "VRV_collections": [('BMS_Seville_Climatizacion_VRV', None)],
@@ -155,7 +138,8 @@ sites_dict = {
         'gateway_reg_express': r'MIT([\d]+).[\w.-]+_([\d]+).',
         'coordinates': (37.37821, -5.97253),
         'floors_order': ["Planta S", "Planta B", "Planta 1", "Planta 2", "Planta 3", "Planta 4",
-                         "Planta 5", "Planta 6", "Planta 7", "Planta 8", "Planta 9"]
+                         "Planta 5", "Planta 6", "Planta 7", "Planta 8", "Planta 9"],
+        'floors_col': 'Title'
     },
     "Amro Malaga": {
         "VRV_collections": [("BMS_Malaga_Climatizacion_Planta_S", "Planta S"),
@@ -170,7 +154,8 @@ sites_dict = {
         'rooms_file': "rooms_codes_malaga.csv",
         'gateway_reg_express': r'VRV([\d]+).[\w.-]+_([\d]+).',
         'coordinates': (36.726308, -4.472825),
-        'floors_order': ["Planta S", "Planta B", "Planta 1", "Planta 2", "Planta 3",  "Planta 4"]
+        'floors_order': ["Planta S", "Planta B", "Planta 1", "Planta 2", "Planta 3",  "Planta 4"],
+        'floors_col': 'Title'
     },
 }
 
