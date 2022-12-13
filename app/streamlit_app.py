@@ -58,7 +58,7 @@ def set_homepage():
 
 def main():
     date_yesterday = (times.utc_now() - timedelta(days=1))#.strftime("%Y_%m_%d")
-    db = fb.get_db_from_firebase_key()  # Set unchanged settings in the app once
+    db = fb.get_db_from_firebase_key(cnf.storage_bucket)  # Set unchanged settings in the app once
     # cert_file_path = os.path.join(os.path.realpath('./'), cnf.cert_file)
     # db = fb.get_db_from_cert_file(cert_file_path, cnf.storage_bucket)  # Set unchanged settings in the app once
 
