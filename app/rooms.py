@@ -5,44 +5,14 @@ import times
 import pandas as pd
 
 
-@st.experimental_singleton(show_spinner=False)
+@st.experimental_memo(show_spinner=False)
 def read_room_file(rooms_mapping_file):
     path = os.path.dirname(__file__)
     return pd.read_csv(os.path.join(path, rooms_mapping_file), encoding='latin-1')
 
 
-@st.experimental_singleton(show_spinner=False)
-def get_floor_to_rooms_dict(rooms_mapping_file):
+@st.experimental_memo(show_spinner=False)
+def get_floor_to_rooms_dict(rooms_mapping_file, floors_col):
     rooms_df = read_room_file(rooms_mapping_file)
-    rooms_df = rooms_df[['ROOM', 'Title']].groupby('Title')['ROOM'].apply(list)
+    rooms_df = rooms_df[['ROOM', floors_col]].groupby(floors_col)['ROOM'].apply(list)
     return rooms_df.to_dict()
-
-
-@st.experimental_singleton(show_spinner=False)
-def get_code_to_room_dict(rooms_mapping_file):
-    rooms_df = read_room_file(rooms_mapping_file)
-    rooms_df = (rooms_df[['Gateway', 'ROOM', 'BACnet reading number', 'Title']]
-                .set_index(['Gateway', 'BACnet reading number']))
-    return rooms_df.to_dict(orient='index')
-
-
-def map_rooms_names(df, rooms_dict, gateway_room_pattern):
-    new_columns = []
-    new_titles = []
-    for room_id in df.columns:
-        match = re.search(gateway_room_pattern, room_id)
-        if match:
-            val = (int(match.group(1)), int(match.group(2)))
-            key = rooms_dict.get(val)
-            if key:
-                new_columns += [key['ROOM']]
-                new_titles += [key['Title']]
-            else:
-                new_columns += [room_id]
-                new_titles += ['']
-        else:
-            new_columns += [room_id]
-            new_titles += ['']
-
-    df.columns = pd.MultiIndex.from_arrays([new_titles, new_columns])  # new_columns
-    return df

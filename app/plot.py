@@ -30,17 +30,16 @@ def plot_heatmap(df, time_param, plot_parms, title, to_zone, scale, col):
     fig = plt.figure(figsize=(scale*24, scale*len(df_agg.columns)))
     sns.set(font_scale=scale*2)
 
-    if st.session_state.show_raw_data_heatmaps:
+    if st.session_state.hmaps_raw_data:
         col.header(title)
         col.dataframe(df_agg.sort_index())
     else:
         df_plot = df_agg.T.sort_index()
         sns.heatmap(df_plot,
-                    annot=True, annot_kws={"fontsize": scale*16, "weight": "bold"},
+                    annot=True, annot_kws={"fontsize": scale * 16, "weight": "bold"},
                     fmt=fmt, linewidths=.5,
                     cmap=sns.color_palette("coolwarm", as_cmap=True),
                     vmin=vmin, vmax=vmax, cbar=False)
-
         labels_fontsize = scale * 24
         plt.title(title, fontsize=labels_fontsize)  # title with fontsize 20
         plt.xlabel(time_param_dict['aggregation_field_name'], fontsize=labels_fontsize)  # x-axis label with fontsize 15
@@ -49,7 +48,7 @@ def plot_heatmap(df, time_param, plot_parms, title, to_zone, scale, col):
         col.write(fig)
 
 
-@st.experimental_singleton(show_spinner=False)
+@st.experimental_memo(show_spinner=False)
 def create_start_end_times(df, col_name):
     column = df[col_name]
     start_on_times = []

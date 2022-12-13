@@ -9,6 +9,7 @@ test = True
 
 figure_memory_scale = 0.25  # scaling the original seaborn in order to reduce memory usage
 cert_file = "amro-partners-firebase-adminsdk-syddx-7de4edb3c4.json"  # certification file for firebase authentication
+storage_bucket = 'amro-partners.appspot.com'
 
 tabs = ["HEATMAPS", "CHARTS", "EXPERIMENTS"]
 
@@ -70,7 +71,7 @@ data_param_dict = {
     '_Outside temperature 3h prediction (°C)': {
         'sites_dict_val': 'weather_collection',
         'is_rooms': False,
-        'field_keyword': ['3h_temperature_sim'],
+        'field_keyword': ['3h_temperature_interp'],
         'match_keyword': 'exact',  # 'substring' or 'exact' match for field_keyword
     },
 }
@@ -90,60 +91,45 @@ time_param_dict = {
         'aggregation_field_name': 'Hour',
         'aggregation_strftime': '%H'
     },
-    "Latest reading": {
-        'start_date_utc': (times.utc_now() - timedelta(minutes=15)),
-        'end_date_utc': (times.utc_now()),
-        'aggregation_field_name': 'Local time',
-        'aggregation_strftime': '%Y-%m-%d %H:%M:%S'
-    },
+    # "Latest reading": {
+    #     'start_date_utc': (times.utc_now() - timedelta(minutes=15)),
+    #     'end_date_utc': (times.utc_now()),
+    #     'aggregation_field_name': 'Local time',
+    #     'aggregation_strftime': '%Y-%m-%d %H:%M:%S'
+    # },
 }
 
 
 sites_dict = {
-    "Amro Seville temperature prediction pilot": {
+    "Amro Seville fan speed pilot CL01": {
         "VRV_collections": [('BMS_Seville_Climatizacion_VRV', None)],
         'VRV_setpoint_collections': [('BMS_Seville_Climatizacion_VRV_setpoints', None)],
         'weather_collection': [('weather_Seville', 'Outside temperature (°C) Seville')],
         'time_zone': 'Europe/Madrid',
-        'rooms_file': "rooms_codes_seville_exp.csv",
+        'rooms_file': "rooms_codes_seville_CL01_exp.csv",
         'gateway_reg_express': r'MIT([\d]+).[\w.-]+_([\d]+).',
         'coordinates': (37.37821, -5.97253),
         'floors_order': ['Control',
                          'Test'],
-        # 'Test group B - predicted temperatures',
-        # 'Test group C - both effects'],
-        'start_date_utc': datetime(2022, 10, 13, 9, 16),
-        'start_exp_date_utc': datetime(2022, 10, 13, 9, 16),  # add 1 day + 2 hours forward for the simulations
-        'end_date_utc': datetime(2022, 11, 10, 0, 0),
-        # 'start_date_utc': datetime(2022, 10, 11, 9, 16),
-        # 'start_exp_date_utc': datetime(2022, 10, 11, 9, 16),  # add 1 day + 2 hours forward for the simulations
-        # 'end_date_utc': datetime(2022, 10, 15, 0, 0),
-        'shrink_ac_threshold': 5,
-        'pos_diff2outside_coef': 0,
-        ''
-        'is_gradual': False
+        'floors_col': 'Group',
+        'start_exp_date_utc': datetime(2022, 12, 2, 12, 0),
+        'end_exp_date_utc': datetime(2022, 12, 30, 12, 0),
+            'calibration_days': 7
     },
-    "Amro Seville ventilation pilot": {
+    "Amro Seville ventilation temp pilot CL02": {
         "VRV_collections": [('BMS_Seville_Climatizacion_VRV', None)],
         'VRV_setpoint_collections': [('BMS_Seville_Climatizacion_VRV_setpoints', None)],
         'weather_collection': [('weather_Seville', 'Outside temperature (°C) Seville')],
         'time_zone': 'Europe/Madrid',
-        'rooms_file': "rooms_codes_seville_exp2.csv",
+        'rooms_file': "rooms_codes_seville_CL02_exp.csv",
         'gateway_reg_express': r'MIT([\d]+).[\w.-]+_([\d]+).',
         'coordinates': (37.37821, -5.97253),
         'floors_order': ['Control',
                          'Test'],
-                         # 'Test group B - predicted temperatures',
-                         # 'Test group C - both effects'],
-        'start_date_utc': datetime(2022, 10, 11, 9, 16),
-        'start_exp_date_utc': datetime(2022, 10, 11, 9, 16),  # add 1 day + 2 hours forward for the simulations
-        'end_date_utc': datetime(2022, 11, 3, 0, 0),
-        # 'start_date_utc': datetime(2022, 10, 11, 9, 16),
-        # 'start_exp_date_utc': datetime(2022, 10, 11, 9, 16),  # add 1 day + 2 hours forward for the simulations
-        # 'end_date_utc': datetime(2022, 10, 15, 0, 0),
-        'shrink_ac_threshold': 0.5,
-        'pos_diff2outside_coef': 0.3,
-        'is_gradual': True
+        'floors_col': 'Group',
+        'start_exp_date_utc': datetime(2022, 12, 2, 12, 0),
+        'end_exp_date_utc': datetime(2022, 12, 30, 12, 0),
+        'calibration_days': 7
     },
     "Amro Seville": {
         "VRV_collections": [('BMS_Seville_Climatizacion_VRV', None)],
@@ -154,7 +140,8 @@ sites_dict = {
         'gateway_reg_express': r'MIT([\d]+).[\w.-]+_([\d]+).',
         'coordinates': (37.37821, -5.97253),
         'floors_order': ["Planta S", "Planta B", "Planta 1", "Planta 2", "Planta 3", "Planta 4",
-                         "Planta 5", "Planta 6", "Planta 7", "Planta 8", "Planta 9"]
+                         "Planta 5", "Planta 6", "Planta 7", "Planta 8", "Planta 9"],
+        'floors_col': 'Title'
     },
     "Amro Malaga": {
         "VRV_collections": [("BMS_Malaga_Climatizacion_Planta_S", "Planta S"),
@@ -169,7 +156,8 @@ sites_dict = {
         'rooms_file': "rooms_codes_malaga.csv",
         'gateway_reg_express': r'VRV([\d]+).[\w.-]+_([\d]+).',
         'coordinates': (36.726308, -4.472825),
-        'floors_order': ["Planta S", "Planta B", "Planta 1", "Planta 2", "Planta 3",  "Planta 4"]
+        'floors_order': ["Planta S", "Planta B", "Planta 1", "Planta 2", "Planta 3",  "Planta 4"],
+        'floors_col': 'Title'
     },
 }
 
@@ -179,28 +167,43 @@ non_test_sites = [s for s in sites_dict.keys() if all([sub not in s for sub in t
 
 
 # Experiment settings
-avg_group_time_field_name = 'time avg'  # avg across the group per timestamp
-avg_pre_field_name = 'summary avg pre'  # avg across the group
-avg_post_field_name = 'summary avg post'  # avg across the group
-ste_post_field_name = 'summary ste post'  # avg across the group
-num_rooms_field_name = 'Number of rooms'  # number of rooms across the group
-exp_duration_field_name = 'exp duration'  # number of rooms across the group
-elect_consump_name = 'Average electricity consumption (kWh)'  # number of rooms across the group
-elect_cost_name = 'Average electricity cost (€) (ex. VAT)'  # number of rooms across the group
-elect_carbon_name = 'Average carbon footprint (kg CO2)'  # number of rooms across the group
+avg_group_df_name = 'summary avg'  # avg across the group per timestamp
+avg_pre_df_name = 'summary avg pre'  # avg across the group
+avg_post_df_name = 'summary avg post'  # avg across the group
+
+num_rooms_name = 'Number of rooms'  # number of rooms across the group
+
+room_temp_name = "Avg. room temperature (°C)"  # avg. room temperature
+temp_setpoint_name = 'Cooling temperature set point (°C)'
+ac_usage_name = 'Percentage of A/C usage (%)'
+elect_consump_name = 'Average room electricity consumption (kWh)'  # number of rooms across the group
+elect_cost_name = 'Average room electricity cost (€) (ex. VAT)'  # number of rooms across the group
+elect_carbon_name = 'Average room carbon footprint (kg CO2)'  # number of rooms across the group
 
 
-formatters = {num_rooms_field_name: lambda x: f"{round(x)}" if x == x else x,
-              "Avg. room temperature (°C)": lambda x: f"{x:.2f}" if type(x) in (float, np.float32, np.float64) else f"[{x[0]:.2f}, {x[1]:.2f}]",
-              'Cooling temperature set point (°C)': lambda x: f"{x:.2f}" if type(x) in (float, np.float32, np.float64) else f"[{x[0]:.2f}, {x[1]:.2f}]",
-              "Percentage of A/C usage (%)": lambda x: f"{x:.1%}" if type(x) in (float, np.float32, np.float64) else f"[{x[0]:.1%}, {x[1]:.1%}]",
-              elect_consump_name: lambda x: f"{x:.2f}" if type(x) in (float, np.float32, np.float64) else f"[{x[0]:.2f}, {x[1]:.2f}]",
-              elect_cost_name: lambda x: f"{x:.2f}" if type(x) in (float, np.float32, np.float64) else f"[{x[0]:.2f}, {x[1]:.2f}]",
-              elect_carbon_name: lambda x: f"{x:.2f}" if type(x) in (float, np.float32, np.float64) else f"[{x[0]:.2f}, {x[1]:.2f}]",
-              }
+formatters = {
+    num_rooms_name: lambda x: f"{round(x)}" if x == x else x,
+    room_temp_name: lambda x: f"{x:.2f}" if type(x) in (float, np.float32, np.float64) else f"[{x[0]:.2f}, {x[1]:.2f}]",
+    temp_setpoint_name: lambda x: f"{x:.2f}" if type(x) in (float, np.float32, np.float64) else f"[{x[0]:.2f}, {x[1]:.2f}]",
+    ac_usage_name: lambda x: f"{x:.1%}" if type(x) in (float, np.float32, np.float64) else f"[{x[0]:.1%}, {x[1]:.1%}]",
+    elect_consump_name: lambda x: f"{x:.2f}" if type(x) in (float, np.float32, np.float64) else f"[{x[0]:.2f}, {x[1]:.2f}]",
+    elect_cost_name: lambda x: f"{x:.2f}" if type(x) in (float, np.float32, np.float64) else f"[{x[0]:.2f}, {x[1]:.2f}]",
+    elect_carbon_name: lambda x: f"{x:.2f}" if type(x) in (float, np.float32, np.float64) else f"[{x[0]:.2f}, {x[1]:.2f}]"
+}
 
-metrics = ["Avg. room temperature (°C)",
-           "Percentage of A/C usage (%)",
+formatters2 = {
+    num_rooms_name: lambda x: f"{round(x)}" if x == x else x,
+    room_temp_name: lambda x: f"{x:.1%}" if type(x) in (float, np.float32, np.float64) else f"[{x[0]:.1%}, {x[1]:.1%}]",
+    temp_setpoint_name: lambda x: f"{x:.1%}" if type(x) in (float, np.float32, np.float64) else f"[{x[0]:.1%}, {x[1]:.1%}]",
+    ac_usage_name: lambda x: f"{x:.1%}" if type(x) in (float, np.float32, np.float64) else f"[{x[0]:.1%}, {x[1]:.1%}]",
+    elect_consump_name: lambda x: f"{x:.1%}" if type(x) in (float, np.float32, np.float64) else f"[{x[0]:.1%}, {x[1]:.1%}]",
+    elect_cost_name: lambda x: f"{x:.1%}" if type(x) in (float, np.float32, np.float64) else f"[{x[0]:.1%}, {x[1]:.1%}]",
+    elect_carbon_name: lambda x: f"{x:.1%}" if type(x) in (float, np.float32, np.float64) else f"[{x[0]:.1%}, {x[1]:.1%}]",
+}
+
+metrics = [room_temp_name,
+           temp_setpoint_name,
+           ac_usage_name,
            elect_consump_name,
            elect_cost_name,
            elect_carbon_name]

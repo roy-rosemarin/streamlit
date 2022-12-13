@@ -1,10 +1,19 @@
-from datetime import datetime
+from datetime import datetime, timedelta
 from pytz import timezone
 import streamlit as st
 
 
+def log(*message):
+    print(f'**************** {utc_now()} : {message}')
+
+
+def daterange(start_date, end_date):
+    for n in range(int((end_date - start_date).days)):
+        yield start_date + timedelta(n)
+
+
 def utc_now():
-    return datetime(2022, 11, 15, 0, 0)  ################  TODO: change back to datetime.utcnow()
+    return datetime.utcnow()
 
 
 @st.experimental_singleton
