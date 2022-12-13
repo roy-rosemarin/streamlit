@@ -80,30 +80,32 @@ def main():
     #     print(3, times.utc_now())
     #     for collection_df in hmp_dict[tab1_building_param, tab1_data_param, tab1_time_param].values():
     #         hmap.run_plots_heatmaps(collection_df, tab1_building_param, tab1_data_param, tab1_time_param, col12)
-    #
+
     # Charts
     # charts_dict structure: {building_param -> floor_param or collection title -> room --> df of all params}
     # TODO: move the below loops and concatenation into transfer process
-    charts_list_of_dicts = []
-    for days_back in reversed(range(1, 8)):
-        date_back = (times.utc_now() - timedelta(days=days_back)).strftime("%Y_%m_%d")
-        charts_list_of_dicts.append(fb.read_and_unpickle(f'charts_{date_back}', bucket_name=None))
-
-    charts_dict_of_dfs = {}
-    for building_param in [bp for bp in charts_list_of_dicts[0].keys() if bp in cnf.non_test_sites]:
-        charts_dict_of_dfs[building_param] = {}
-        for floor_param in charts_list_of_dicts[0][building_param].keys():
-            charts_dict_of_dfs[building_param][floor_param] = {}
-            for room_param in charts_list_of_dicts[0][building_param][floor_param].keys():
-                charts_dict_of_dfs[building_param][floor_param][room_param] = (
-                    pd.concat([dic[building_param][floor_param][room_param] for dic in charts_list_of_dicts])
-                    .drop_duplicates())
-
-    cha.run_flow_charts(charts_dict_of_dfs[building_param][floor_param][room_param], col22)
+    # charts_list_of_dicts = []
+    # for days_back in reversed(range(1, 8)):
+    #     date_back = (times.utc_now() - timedelta(days=days_back)).strftime("%Y_%m_%d")
+    #     charts_list_of_dicts.append(fb.read_and_unpickle(f'charts_{date_back}', bucket_name=None))
+    #
+    # charts_dict_of_dfs = {}
+    # for building_param in [bp for bp in charts_list_of_dicts[0].keys() if bp in cnf.non_test_sites]:
+    #     charts_dict_of_dfs[building_param] = {}
+    #     for floor_param in charts_list_of_dicts[0][building_param].keys():
+    #         charts_dict_of_dfs[building_param][floor_param] = {}
+    #         for room_param in charts_list_of_dicts[0][building_param][floor_param].keys():
+    #             charts_dict_of_dfs[building_param][floor_param][room_param] = (
+    #                 pd.concat([dic[building_param][floor_param][room_param] for dic in charts_list_of_dicts])
+    #                 .drop_duplicates())
+    #
+    # tab2_building_param, tab2_floor_param, tab2_room_param
+    # cha.run_flow_charts(charts_dict_of_dfs[tab2_building_param][tab2_floor_param][tab2_room_param], col22)
 
     # Experiments
     # exp_dict structure: {building_param -> floor_param or collection title -> room --> df of all params}
-    start_date = cnf.sites_dict[tab3_building_param]['start_exp_date_utc']-timedelta(days=7)
+    start_date = (cnf.sites_dict[tab3_building_param]['start_exp_date_utc']
+                  - timedelta(days=cnf.sites_dict[tab3_building_param]['calibration_days']))
     end_date = min(date_yesterday, cnf.sites_dict[tab3_building_param]['end_exp_date_utc'])
     exp_list_of_dicts = []
     for date in times.daterange(start_date, end_date):
@@ -112,17 +114,31 @@ def main():
 
 
     exp_dict_of_dfs = {}
+    summary_dict = {}
     for building_param in [bp for bp in exp_list_of_dicts[0].keys() if bp in cnf.test_sites]:
         exp_dict_of_dfs[building_param] = {}
         for floor_param in exp_list_of_dicts[0][building_param].keys():
             exp_dict_of_dfs[building_param][floor_param] = {}
             for room_param in exp_list_of_dicts[0][building_param][floor_param].keys():
                 exp_dict_of_dfs[building_param][floor_param][room_param] = (
-                    pd.concat([dic[building_param][floor_param][room_param] for dic in exp_list_of_dicts])
-                    .drop_duplicates())
-        exp_dict_of_dfs[building_param] = exp.add_avg_group(building_param, exp_dict_of_dfs[building_param])
+                    pd.concat([dic[building_param][floor_param][room_param]
+                               for dic in exp_list_of_dicts]).drop_duplicates())
 
-    exp.run_summary_exp(exp_dict_of_dfs[tab3_building_param], tab3_building_param, tab3_metric_param, tab3_time_param, col32)
+        summary_dict[building_param] = exp.get_exp_summary_dict(building_param, exp_dict_of_dfs[building_param])
+    del exp_dict_of_dfs
+
+    test_dict = summary_dict[tab3_building_param][cnf.test_group]
+    control_dict = summary_dict[tab3_building_param][cnf.control_group]
+
+    # get selected metric summarised in a compact df
+    metric_df = exp.get_selected_metric_df(test_dict, control_dict, tab3_building_param, tab3_metric_param,
+                                           tab3_time_param)
+    if 'exp_raw_data' in st.session_state and st.session_state.exp_raw_data:
+        col32.dataframe(metric_df, use_container_width=True)
+    else:
+        exp.show_summary_tables(test_dict, control_dict, col32, tab3_building_param)
+        chart = exp.chart_df(metric_df, building_param, tab3_metric_param)
+        col32.altair_chart(chart.interactive(), use_container_width=True)
 
 
 main()
