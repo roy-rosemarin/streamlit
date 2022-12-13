@@ -58,8 +58,9 @@ def set_homepage():
 
 def main():
     date_yesterday = (times.utc_now() - timedelta(days=1))#.strftime("%Y_%m_%d")
-    cert_file_path = os.path.join(os.path.realpath('./'), cnf.cert_file)
-    db = fb.get_db_from_cert_file(cert_file_path, cnf.storage_bucket)  # Set unchanged settings in the app once
+    db = fb.get_db_from_firebase_key()  # Set unchanged settings in the app once
+    # cert_file_path = os.path.join(os.path.realpath('./'), cnf.cert_file)
+    # db = fb.get_db_from_cert_file(cert_file_path, cnf.storage_bucket)  # Set unchanged settings in the app once
 
     (col12, tab1_building_param, tab1_data_param, tab1_time_param,
      col22, tab2_building_param, tab2_floor_param, tab2_room_param,
