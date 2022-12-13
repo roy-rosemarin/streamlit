@@ -9,10 +9,10 @@ from google.oauth2 import service_account
 pd.options.mode.chained_assignment = None  # default='warn'
 
 
-def get_db_from_firebase_key():
+def get_db_from_firebase_key(storage_bucket):
     key_dict = json.loads(st.secrets["firebase_key"])
     creds = service_account.Credentials.from_service_account_info(key_dict)
-    firebase_admin.initialize_app(creds, {'storageBucket': cnf.storage_bucket})
+    firebase_admin.initialize_app(creds, {'storageBucket': storage_bucket})
     return firestore.Client(credentials=creds, project="amro-partners")
 
 
