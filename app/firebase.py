@@ -3,8 +3,16 @@ import firebase_admin
 from firebase_admin import credentials, firestore, storage
 import streamlit as st
 import pickle
+import json
+from google.oauth2 import service_account
 
 pd.options.mode.chained_assignment = None  # default='warn'
+
+
+def get_db_from_firebase_key():
+    key_dict = json.loads(st.secrets["firebase_key"])
+    creds = service_account.Credentials.from_service_account_info(key_dict)
+    return firestore.Client(credentials=creds, project="amro-partners")
 
 
 def get_db_from_cert_file(cert_file, storage_bucket):
