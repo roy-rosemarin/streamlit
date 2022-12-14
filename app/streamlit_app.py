@@ -58,51 +58,51 @@ def set_homepage():
 
 def main():
     date_yesterday = (times.utc_now() - timedelta(days=1))#.strftime("%Y_%m_%d")
-    #firestore_client, storage_bucket = fb.get_db_from_firebase_key(cnf.storage_bucket)
+    firestore_client, storage_bucket = fb.get_db_from_firebase_key(cnf.storage_bucket)
 
-    # cert_file_path = os.path.join(os.path.realpath('./'), cnf.cert_file)
-    # firestore_client, storage_bucket = fb.get_db_from_cert_file(cert_file_path, cnf.storage_bucket)  # Set unchanged settings in the app once
+    cert_file_path = os.path.join(os.path.realpath('./'), cnf.cert_file)
+    firestore_client, storage_bucket = fb.get_db_from_cert_file(cert_file_path, cnf.storage_bucket)  # Set unchanged settings in the app once
 
     (col12, tab1_building_param, tab1_data_param, tab1_time_param,
      col22, tab2_building_param, tab2_floor_param, tab2_room_param,
      col32, tab3_building_param, tab3_metric_param, tab3_time_param) = set_homepage()  # Get choice of building
 
-    # # Heatmaps
-    # tab1_building_dict, tab1_param_dict, tab1_time_param_dict = utils.get_config_dicts(tab1_building_param,
-    #                                                                                    tab1_data_param, tab1_time_param)
-    # collections = tab1_building_dict[tab1_param_dict['sites_dict_val']]
-    # if not collections:
-    #     col12.subheader('Sorry. This data is not available for the site.')
-    # else:
-    #     print(1, times.utc_now())
-    #     # hmp_dict structure: {[building_param, data_param, time_param] -> collect_name  -> collect_title else rooms_title -> df of the collection and parameter}
-    #     hmp_dict = fb.read_and_unpickle(f'heatmpas_{date_yesterday.strftime("%Y_%m_%d")}', storage_bucket)
-    #     print(2, times.utc_now())
-    #
-    #     print(3, times.utc_now())
-    #     for collection_df in hmp_dict[tab1_building_param, tab1_data_param, tab1_time_param].values():
-    #         hmap.run_plots_heatmaps(collection_df, tab1_building_param, tab1_data_param, tab1_time_param, col12)
+    # Heatmaps
+    tab1_building_dict, tab1_param_dict, tab1_time_param_dict = utils.get_config_dicts(tab1_building_param,
+                                                                                       tab1_data_param, tab1_time_param)
+    collections = tab1_building_dict[tab1_param_dict['sites_dict_val']]
+    if not collections:
+        col12.subheader('Sorry. This data is not available for the site.')
+    else:
+        print(1, times.utc_now())
+        # hmp_dict structure: {[building_param, data_param, time_param] -> collect_name  -> collect_title else rooms_title -> df of the collection and parameter}
+        hmp_dict = fb.read_and_unpickle(f'heatmpas_{date_yesterday.strftime("%Y_%m_%d")}', storage_bucket)
+        print(2, times.utc_now())
 
-    # Charts
-    # charts_dict structure: {building_param -> floor_param or collection title -> room --> df of all params}
-    # TODO: move the below loops and concatenation into transfer process
-    # charts_list_of_dicts = []
-    # for days_back in reversed(range(1, 8)):
-    #     date_back = (times.utc_now() - timedelta(days=days_back)).strftime("%Y_%m_%d")
-    #     charts_list_of_dicts.append(fb.read_and_unpickle(f'charts_{date_back}', storage_bucket))
-    #
-    # charts_dict_of_dfs = {}
-    # for building_param in [bp for bp in charts_list_of_dicts[0].keys() if bp in cnf.non_test_sites]:
-    #     charts_dict_of_dfs[building_param] = {}
-    #     for floor_param in charts_list_of_dicts[0][building_param].keys():
-    #         charts_dict_of_dfs[building_param][floor_param] = {}
-    #         for room_param in charts_list_of_dicts[0][building_param][floor_param].keys():
-    #             charts_dict_of_dfs[building_param][floor_param][room_param] = (
-    #                 pd.concat([dic[building_param][floor_param][room_param] for dic in charts_list_of_dicts])
-    #                 .drop_duplicates())
-    #
-    # tab2_building_param, tab2_floor_param, tab2_room_param
-    # cha.run_flow_charts(charts_dict_of_dfs[tab2_building_param][tab2_floor_param][tab2_room_param], col22)
+        print(3, times.utc_now())
+        for collection_df in hmp_dict[tab1_building_param, tab1_data_param, tab1_time_param].values():
+            hmap.run_plots_heatmaps(collection_df, tab1_building_param, tab1_data_param, tab1_time_param, col12)
+
+    Charts
+    charts_dict structure: {building_param -> floor_param or collection title -> room --> df of all params}
+    TODO: move the below loops and concatenation into transfer process
+    charts_list_of_dicts = []
+    for days_back in reversed(range(1, 8)):
+        date_back = (times.utc_now() - timedelta(days=days_back)).strftime("%Y_%m_%d")
+        charts_list_of_dicts.append(fb.read_and_unpickle(f'charts_{date_back}', storage_bucket))
+
+    charts_dict_of_dfs = {}
+    for building_param in [bp for bp in charts_list_of_dicts[0].keys() if bp in cnf.non_test_sites]:
+        charts_dict_of_dfs[building_param] = {}
+        for floor_param in charts_list_of_dicts[0][building_param].keys():
+            charts_dict_of_dfs[building_param][floor_param] = {}
+            for room_param in charts_list_of_dicts[0][building_param][floor_param].keys():
+                charts_dict_of_dfs[building_param][floor_param][room_param] = (
+                    pd.concat([dic[building_param][floor_param][room_param] for dic in charts_list_of_dicts])
+                    .drop_duplicates())
+
+    tab2_building_param, tab2_floor_param, tab2_room_param
+    cha.run_flow_charts(charts_dict_of_dfs[tab2_building_param][tab2_floor_param][tab2_room_param], col22)
 
     # Experiments
     # exp_dict structure: {building_param -> floor_param or collection title -> room --> df of all params}
