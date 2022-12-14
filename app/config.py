@@ -114,7 +114,9 @@ sites_dict = {
         'floors_col': 'Group',
         'start_exp_date_utc': datetime(2022, 12, 2, 12, 0),
         'end_exp_date_utc': datetime(2022, 12, 30, 12, 0),
-            'calibration_days': 7
+        'calibration_days': 7,
+        'market_based_electricity_cost': 0.370,
+        'location_based_co2': 0.136
     },
     "Amro Seville ventilation temp pilot CL02": {
         "VRV_collections": [('BMS_Seville_Climatizacion_VRV', None)],
@@ -129,7 +131,9 @@ sites_dict = {
         'floors_col': 'Group',
         'start_exp_date_utc': datetime(2022, 12, 2, 12, 0),
         'end_exp_date_utc': datetime(2022, 12, 30, 12, 0),
-        'calibration_days': 7
+        'calibration_days': 7,
+        'market_based_electricity_cost': 0.370,
+        'location_based_co2': 0.136
     },
     "Amro Seville": {
         "VRV_collections": [('BMS_Seville_Climatizacion_VRV', None)],
@@ -216,3 +220,4 @@ time_agg_dict = {
     'Hourly': '1H',
     '15 minutes': '15T'
 }
+
