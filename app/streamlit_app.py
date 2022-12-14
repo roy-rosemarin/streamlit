@@ -58,9 +58,10 @@ def set_homepage():
 
 def main():
     date_yesterday = (times.utc_now() - timedelta(days=1))#.strftime("%Y_%m_%d")
-    db = fb.get_db_from_firebase_key(cnf.storage_bucket)  # Set unchanged settings in the app once
+    #firestore_client, storage_bucket = fb.get_db_from_firebase_key(cnf.storage_bucket)
+
     # cert_file_path = os.path.join(os.path.realpath('./'), cnf.cert_file)
-    # db = fb.get_db_from_cert_file(cert_file_path, cnf.storage_bucket)  # Set unchanged settings in the app once
+    # firestore_client, storage_bucket = fb.get_db_from_cert_file(cert_file_path, cnf.storage_bucket)  # Set unchanged settings in the app once
 
     (col12, tab1_building_param, tab1_data_param, tab1_time_param,
      col22, tab2_building_param, tab2_floor_param, tab2_room_param,
@@ -75,7 +76,7 @@ def main():
     # else:
     #     print(1, times.utc_now())
     #     # hmp_dict structure: {[building_param, data_param, time_param] -> collect_name  -> collect_title else rooms_title -> df of the collection and parameter}
-    #     hmp_dict = fb.read_and_unpickle(f'heatmpas_{date_yesterday.strftime("%Y_%m_%d")}', bucket_name=None)
+    #     hmp_dict = fb.read_and_unpickle(f'heatmpas_{date_yesterday.strftime("%Y_%m_%d")}', storage_bucket)
     #     print(2, times.utc_now())
     #
     #     print(3, times.utc_now())
@@ -88,7 +89,7 @@ def main():
     # charts_list_of_dicts = []
     # for days_back in reversed(range(1, 8)):
     #     date_back = (times.utc_now() - timedelta(days=days_back)).strftime("%Y_%m_%d")
-    #     charts_list_of_dicts.append(fb.read_and_unpickle(f'charts_{date_back}', bucket_name=None))
+    #     charts_list_of_dicts.append(fb.read_and_unpickle(f'charts_{date_back}', storage_bucket))
     #
     # charts_dict_of_dfs = {}
     # for building_param in [bp for bp in charts_list_of_dicts[0].keys() if bp in cnf.non_test_sites]:
@@ -111,7 +112,7 @@ def main():
     exp_list_of_dicts = []
     for date in times.daterange(start_date, end_date):
         times.log(f'loading file experiments_{date.strftime("%Y_%m_%d")}')
-        exp_list_of_dicts.append(fb.read_and_unpickle(f'experiments_{date.strftime("%Y_%m_%d")}', bucket_name=None))
+        exp_list_of_dicts.append(fb.read_and_unpickle(f'experiments_{date.strftime("%Y_%m_%d")}', storage_bucket))
 
 
     exp_dict_of_dfs = {}
