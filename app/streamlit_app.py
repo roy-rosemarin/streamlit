@@ -83,9 +83,9 @@ def main():
         for collection_df in hmp_dict[tab1_building_param, tab1_data_param, tab1_time_param].values():
             hmap.run_plots_heatmaps(collection_df, tab1_building_param, tab1_data_param, tab1_time_param, col12)
 
-    Charts
-    charts_dict structure: {building_param -> floor_param or collection title -> room --> df of all params}
-    TODO: move the below loops and concatenation into transfer process
+    # Charts
+    # charts_dict structure: {building_param -> floor_param or collection title -> room --> df of all params}
+    # TODO: move the below loops and concatenation into transfer process
     charts_list_of_dicts = []
     for days_back in reversed(range(1, 8)):
         date_back = (times.utc_now() - timedelta(days=days_back)).strftime("%Y_%m_%d")
