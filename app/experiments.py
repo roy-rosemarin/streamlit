@@ -166,53 +166,33 @@ def show_summary_tables(_test_dict, _control_dict, _col, building_param):
     summary_df_post = pd.concat([first_row, summary_df_post])
     summary_df_pre_post = pd.concat([first_row, summary_df_pre_post])
 
+    title, intro, body = utils.info(flight_duration_pre,
+                                    building_param,
+                                    building_dict['market_based_electricity_cost'],
+                                    building_dict['location_based_co2'])
+
     _col.subheader('Pre-experiment calibration results')
     _col.text(f'Pre-experiment calibration duration: {start_calibration_date_utc} - {start_exp_date_utc} '
               f'({flight_duration_pre.days} days) ')
     _col.table(utils.format_row_wise(summary_df_pre, cnf.formatters))
-    _col.expander("See how it is calculated", expanded=False).write(
-        f'''
-        Pre-experiment calibration results is a summary statistics table comparing the test and control groups over 
-        different metrics over a {flight_duration_pre.days}-day period to ensure that the groups are similar and any 
-        differences in the results can be attributed to the experiment.
-        \n
-        Number of rooms - number of rooms that belong to each group. The rest of the metrics below provide 
-        **{'per-room'}** averages for the rooms that belong to each group over the full {flight_duration_pre.days}-day 
-        period.\n
-        Cooling temperature set point (°C) - avg. AC cooling set point.\n
-        Percentage of A/C usage (%) - average percentage of time that AC is being used.\n
-        Average room electricity consumption (kWh) - approximate average electricity consumption.\n
-        This is calculated as follows:
-        * VRV internal units - Total consumption in KW of floors 1-8 from BMS over 13 days between dates 21.10.2022-02.11.2022.
-        * VRV external units - Total consumption in KW of external VRV units from BMS over 13 days between dates 21.10.2022-02.11.2022
-        * average % AC usage - 40% over 13 days between dates 21.10.2022-02.11.2022
-        * Number of active rooms - 280 occupied rooms (out of a total of 339 rooms in Seville). 
-        multiplied by 85.6%, which is the relative power capacity of the climatization external units for the rooms and clusters.
-        Then the formula is: \n
-        Avg. tenants VRV kW consumption = (VRV internal units + VRV external units) / (#Hours) = 29.88 kW\n
-        Avg. tenants VRV kWh consumption per occupied room per day  = Avg. tenants VRV kWh consumption * 24 / Number of active rooms = 2.58\n
-        Average room electricity consumption (kWh) = Avg. tenants VRV kWh consumption per occupied room per day * duration in days * 
-        Percentage of A/C usage (%) / average % AC usage = 2.58 * duration in days * Percentage of A/C usage (%) / 40%
-        \n
-        Average room electricity cost (€) (ex. VAT) - approximate average electricity cost calculated by 
-        multiplying electricity consumption (kWh) by the market-based cost factor of
-        {building_dict['location_based_co2']} €/kWh for test "{building_param}".\n
-        Average room carbon footprint (kg CO2) - approximate average carbon footprint (kg CO2) calculated by 
-        multiplying electricity consumption (kWh) by the location-based emission factor of
-        {building_dict['location_based_co2']} kgCO2/kWh for test "{building_param}"
-        '''
+    _col.expander(title, expanded=False).write(f'{intro[0]}\n{body}')
 
-    )
+    title, intro, body = utils.info(flight_duration_post,
+                                    building_param,
+                                    building_dict['market_based_electricity_cost'],
+                                    building_dict['location_based_co2'])
 
-    _col.subheader('Flight period results')
+    _col.subheader('A/B testing period results')
     _col.text(f'Flight duration: {start_exp_date_utc} - {end_exp_date_utc} '
               f'({flight_duration_post.days} days '
               f'{flight_duration_post.seconds // 3600} hours '
               f'{flight_duration_post.seconds%3600//60} minutes)')
     _col.table(utils.format_row_wise(summary_df_post, cnf.formatters))
+    _col.expander(title, expanded=False).write(f'{intro[1]}\n{body}')
 
     _col.subheader('Pre/Post A/B testing results' )
     _col.table(utils.format_row_wise(summary_df_pre_post, cnf.formatters2))
+    _col.expander(title, expanded=False).write(f'{intro[2]}\n{body}')
 
 
 @st.experimental_memo(show_spinner=False)
