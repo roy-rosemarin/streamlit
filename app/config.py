@@ -220,4 +220,3 @@ time_agg_dict = {
     'Hourly': '1H',
     '15 minutes': '15T'
 }
-
