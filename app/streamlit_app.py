@@ -73,9 +73,8 @@ def main():
     if not collections:
         col12.subheader('Sorry. This data is not available for the site.')
     else:
-        print(1, times.utc_now())
         # hmp_dict structure: {[building_param, data_param, time_param] -> collect_name  -> collect_title else rooms_title -> df of the collection and parameter}
-        hmp_dict = fb.read_and_unpickle(f'heatmpas_{date_yesterday.strftime("%Y_%m_%d")}', storage_bucket)
+        hmp_dict = fb.read_and_unpickle(f'heatmaps/{date_yesterday.strftime("%Y/%m/%d")}', storage_bucket)
         print(2, times.utc_now())
 
         print(3, times.utc_now())
@@ -87,8 +86,8 @@ def main():
     # TODO: move the below loops and concatenation into transfer process
     charts_list_of_dicts = []
     for days_back in reversed(range(1, 8)):
-        date_back = (times.utc_now() - timedelta(days=days_back)).strftime("%Y_%m_%d")
-        charts_list_of_dicts.append(fb.read_and_unpickle(f'charts_{date_back}', storage_bucket))
+        date_back = (times.utc_now() - timedelta(days=days_back)).strftime("%Y/%m/%d")
+        charts_list_of_dicts.append(fb.read_and_unpickle(f'old_charts/{date_back}', storage_bucket))
 
     charts_dict_of_dfs = {}
     for building_param in [bp for bp in charts_list_of_dicts[0].keys() if bp in cnf.non_test_sites]:
@@ -100,7 +99,6 @@ def main():
                     pd.concat([dic[building_param][floor_param][room_param] for dic in charts_list_of_dicts])
                     .drop_duplicates())
 
-    tab2_building_param, tab2_floor_param, tab2_room_param
     cha.run_flow_charts(charts_dict_of_dfs[tab2_building_param][tab2_floor_param][tab2_room_param], col22)
 
     # Experiments
@@ -110,8 +108,8 @@ def main():
     end_date = min(date_yesterday, cnf.sites_dict[tab3_building_param]['end_exp_date_utc'])
     exp_list_of_dicts = []
     for date in times.daterange(start_date, end_date):
-        times.log(f'loading file experiments_{date.strftime("%Y_%m_%d")}')
-        exp_list_of_dicts.append(fb.read_and_unpickle(f'experiments_{date.strftime("%Y_%m_%d")}', storage_bucket))
+        times.log(f'loading file experiments/{date.strftime("%Y/%m/%d")}')
+        exp_list_of_dicts.append(fb.read_and_unpickle(f'old_experiments/{date.strftime("%Y/%m/%d")}', storage_bucket))
 
 
     exp_dict_of_dfs = {}
